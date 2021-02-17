@@ -85,6 +85,42 @@ namespace Util
             return new Rect(position.x, position.y, 1, size);
         }
 
+        /// <summary>
+        /// Creates a new rectangle that is the intersection of the two given rectangles.
+        /// </summary>
+        /// <example><code>
+        /// .----------.
+        /// | a        |
+        /// | .--------+----.
+        /// | | result |  b |
+        /// | |        |    |
+        /// '-+--------'    |
+        ///   |             |
+        ///   '-------------'
+        /// </code></example>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Rect Intersect(Rect a, Rect b)
+        {
+            int left = Math.Max(a.Left, b.Left);
+            int right = Math.Min(a.Right, b.Right);
+            int top = Math.Max(a.Top, b.Top);
+            int bottom = Math.Min(a.Bottom, b.Bottom);
+
+            int width = Math.Max(0, right - left);
+            int height = Math.Max(0, bottom - top);
+
+            return new Rect(left, top, width, height);
+        }
+
+        public static Rect CenterIn(Rect toCenter, Rect main)
+        {
+            Vec2 position = main.Position + ((main.Size - toCenter.Size) / 2);
+            
+            return new Rect(position, toCenter.Size);
+        }
+
         #region Operators
 
         public static bool operator ==(Rect r1, Rect r2)
@@ -114,7 +150,7 @@ namespace Util
 
         #endregion
 
-        public Vec2 Position => _size;
+        public Vec2 Position => _position;
         public Vec2 Size => _size;
 
         public int x => _position.x;
@@ -125,7 +161,7 @@ namespace Util
         public int Left => x;
         public int Top => y;
         public int Right => x + Width;
-        public int Bottom => y + Height;
+        public int Bottom => y + Height; // Standard definition for Rects have y growing larger as you go down.
         
         public Vec2 TopLeft => new Vec2(Left, Top);
         public Vec2 TopRight => new Vec2(Right, Top);
@@ -151,24 +187,22 @@ namespace Util
         public Rect(int width, int height) : this(new Vec2(width, height)) { }
         
         public Rect(int x, int y, Vec2 size) : this(new Vec2(x, y), size) { }
-
-        public override string ToString()
-        {
-            return $"({_position})-({_size})";
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is Rect) return Equals((Rect)obj);
-
-            return base.Equals(obj);
-        }
-
+        
         public override int GetHashCode()
         {
             return _position.GetHashCode() + _size.GetHashCode();
         }
 
+        public Rect Offset(Vec2 position, Vec2 size)
+        {
+            return new Rect(_position + position, _size + size);
+        }
+
+        public Rect Offset(int x, int y, int width, int height)
+        {
+            return Offset(new Vec2(x, y), new Vec2(width, height));
+        }
+        
         public Rect Inflate(int distance)
         {
             return new Rect(_position.Offset(-distance, -distance), _size.Offset(distance * 2, distance * 2));
@@ -206,6 +240,16 @@ namespace Util
             return true;
         }
 
+        public Rect Intersect(Rect rect)
+        {
+            return Intersect(this, rect);
+        }
+
+        public Rect CenterIn(Rect rect)
+        {
+            return CenterIn(this, rect);
+        }
+
         public IEnumerable<Vec2> Trace()
         {
             if ((Width > 1) && (Height > 1))
@@ -213,25 +257,39 @@ namespace Util
                 // trace all four sides
                 foreach (Vec2 top in Row(TopLeft, Width - 1)) yield return top;
                 foreach (Vec2 right in Column(TopRight.OffsetX(-1), Height - 1)) yield return right;
+                foreach (Vec2 bottom in Row(Width - 1)) yield return BottomRight.Offset(-1, -1) - bottom;
+                foreach (Vec2 left in Column(Height - 1)) yield return BottomLeft.OffsetY(-1) - left;
             } 
             else if ((Width > 1) && (Height == 1))
             {
                 // a single row
+                foreach (Vec2 position in Row(TopLeft, Width)) yield return position;
             }
             else if ((Width == 1) && (Height >= 1))
             {
                 // a single column or one unit
+                foreach (Vec2 position in Column(TopLeft, Height)) yield return position;
             }
             
             // otherwise, the rect doesn't have a positive size, so there's nothing to trace
+        }
+        
+        public override string ToString()
+        {
+            return $"Position: {_position}; Size: {_size}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Rect) return Equals((Rect)obj);
+
+            return base.Equals(obj);
         }
 
         #region IEquatable<Rect> Members
 
         public bool Equals(Rect other)
         {
-            //if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
             return _position.Equals(other._position) && _size.Equals(other._size);
         }
 

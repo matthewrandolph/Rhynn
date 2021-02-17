@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Engine;
 using UnityEngine;
+using Util.Pathfinding.SearchAlgorithms;
 
-namespace Util
+namespace Util.Pathfinding
 {
     /// <summary>
     /// A fixed-size two-dimensional grid class that can be used as a pathfinding graph.

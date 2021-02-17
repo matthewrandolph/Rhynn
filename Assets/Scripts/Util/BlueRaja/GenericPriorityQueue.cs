@@ -1,9 +1,8 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
-namespace BlueRaja
+namespace Util.BlueRaja
 {
     /// <summary>
     /// A copy of StablePriorityQueue which also has generic priority-type

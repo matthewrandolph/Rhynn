@@ -76,6 +76,20 @@ namespace Util
         #endregion
 
         /// <summary>
+        /// Gets whether the distance between the two given <see cref="Vec2">Vecs</see> is within the given distance.
+        /// </summary>
+        /// <param name="a">First Vec2</param>
+        /// <param name="b">Second Vec2</param>
+        /// <param name="distance">Maximum distance between them</param>
+        /// <returns><c>true</c> if the distance between <c>a</c> and <c>b</c> is less than or equal to <c>distance</c></returns>
+        public static bool IsDistanceWithin(Vec2 a, Vec2 b, int distance)
+        {
+            Vec2 offset = a - b;
+
+            return offset.LengthSquared <= (distance * distance);
+        }
+
+        /// <summary>
         /// Initializes a new instance of Vec2 with the given coordinates.
         /// </summary>
         /// <param name="x">X coordinate</param>
@@ -94,6 +108,33 @@ namespace Util
         /// </summary>
         public int Area => x * y;
 
+        /// <summary>
+        /// Gets the absolute magnitude of the Vec2 squared.
+        /// </summary>
+        public int LengthSquared => (x * x) + (y * y);
+
+        /// <summary>
+        /// Gets the absolute magnitude of the Vec2.
+        /// </summary>
+        public float Length => (float)Math.Sqrt(LengthSquared);
+
+        /// <summary>
+        /// Gets the rook length of the Vec2, which is the number of squares a rook on a chessboard would need to
+        /// move from (0, 0) to reach the endpoint of the Vec. Also known as Manhattan or taxicab distance.
+        /// </summary>
+        public int RookLength => Math.Abs(x) + Math.Abs(y);
+
+        /// <summary>
+        /// Gets the king length of the Vec2, which is the number of squares a king on a chessboard would need to move
+        /// in order to move from (0, 0) to reach the endpoint of the Vec2. Also known as Chebyshev distance.
+        /// </summary>
+        public int KingLength => Math.Max(Math.Abs(x), Math.Abs(y));
+
+        public override string ToString()
+        {
+            return $"({x.ToString()}, {y.ToString()})";
+        }
+
         #region IEquatable<Vec2> Members
         
         public bool Equals(Vec2 other)
@@ -105,7 +146,7 @@ namespace Util
 
         public override bool Equals(object obj)
         {
-            //if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
             return Equals((Vec2) obj);
@@ -117,6 +158,31 @@ namespace Util
             {
                 return (x * 397) ^ y;
             }
+        }
+
+        /// <summary>
+        /// Gets whether the given vector is within a rectangle from (0, 0) to this vector (half-inclusive).
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        public bool Contains(Vec2 vec)
+        {
+            if (vec.x < 0) return false;
+            if (vec.x >= x) return false;
+            if (vec.y < 0) return false;
+            if (vec.y >= y) return false;
+
+            return true;
+        }
+
+        public bool IsAdjacentTo(Vec2 other)
+        {
+            // not adjacent to the exact same position
+            if (this == other) return false;
+
+            Vec2 offset = this - other;
+
+            return (Math.Abs(offset.x) <= 1) && (Math.Abs(offset.y) <= 1);
         }
 
         public Vec2 Offset(int x, int y)
@@ -144,6 +210,13 @@ namespace Util
         public Vec2 OffsetY(int offset)
         {
             return new Vec2(x, y + offset);
+        }
+
+        public Vec2 Each(Func<int, int> function)
+        {
+            if (function == null) throw new ArgumentNullException("function");
+            
+            return new Vec2(function(x), function(y));
         }
         
         #endregion

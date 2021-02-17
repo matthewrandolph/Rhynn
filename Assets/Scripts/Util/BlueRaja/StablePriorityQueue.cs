@@ -1,9 +1,8 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
-namespace BlueRaja
+namespace Util.BlueRaja
 {
     /// <summary>
     /// A copy of FastPriorityQueue which is also stable - that is, when two nodes are enqueued with the same priority, they

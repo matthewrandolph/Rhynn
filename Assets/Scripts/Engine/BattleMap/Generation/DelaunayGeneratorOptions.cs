@@ -1,4 +1,4 @@
-﻿namespace Engine
+﻿namespace Rhynn.Engine.Generation
 {
     /// <summary>
     /// Parameters that tune how the <see cref="DelaunayGenerator"/> will generate dungeons.
@@ -6,10 +6,10 @@
     /// </summary>
     public class DelaunayGeneratorOptions : IGeneratorOptions
     {
-        public int MaxTries { get; set; }
         public int MinimumOpenPercent { get; set; }
         
         // room
+        public int MaxTries { get; set; }
         public int RoomSizeMin { get; set; }
         public int RoomSizeMax { get; set; }
         
@@ -22,9 +22,9 @@
         
         public DelaunayGeneratorOptions()
         {
-            MaxTries = 100;
             MinimumOpenPercent = 20;
 
+            MaxTries = 100;
             RoomSizeMin = 5;
             RoomSizeMax = 20;
 

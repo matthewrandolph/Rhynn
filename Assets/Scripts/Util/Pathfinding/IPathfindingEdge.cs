@@ -1,6 +1,6 @@
-﻿using Engine;
+﻿using Rhynn.Engine;
 
-namespace Util
+namespace Util.Pathfinding
 {
     /// <summary>
     /// Interface used to represent directional edges in a pathfinding graph.

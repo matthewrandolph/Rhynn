@@ -1,7 +1,7 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace BlueRaja
+namespace Util.BlueRaja
 {
     /// <summary>
     /// The IPriorityQueue interface.  This is mainly here for purists, and in case I decide to add more implementations later.

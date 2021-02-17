@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using BlueRaja;
+using Util.BlueRaja;
 
-namespace Util
+namespace Util.Pathfinding.SearchAlgorithms
 {
     public class DijkstraSearchAlgorithm : SearchAlgorithmBase
     {

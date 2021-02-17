@@ -1,4 +1,4 @@
-﻿﻿The MIT License (MIT)
+﻿Files in this folder are licensed under The MIT License (MIT)
 
 Copyright (c) 2013 Daniel "BlueRaja" Pflughoeft
 

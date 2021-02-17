@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Engine;
 
-namespace Util
+namespace Util.Pathfinding
 {
     /// <summary>
     /// Interface to represent graph flood-filling style algorithms used by a pathfinding agent.

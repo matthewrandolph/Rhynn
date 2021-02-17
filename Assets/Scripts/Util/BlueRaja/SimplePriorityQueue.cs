@@ -1,8 +1,8 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BlueRaja
+namespace Util.BlueRaja
 {
     /// <summary>
     /// A simplified priority queue implementation.  Is stable, auto-resizes, and thread-safe, at the cost of being slightly slower than

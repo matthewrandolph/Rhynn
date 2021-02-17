@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Graphs;
 using UnityEngine;
 using Util;
+using Util.Pathfinding;
+using Util.Pathfinding.SearchAlgorithms;
 using Rect = Util.Rect;
 
-namespace Engine
+namespace Rhynn.Engine.Generation
 {
     public class DelaunayFeatureFactory
     {
@@ -20,18 +21,20 @@ namespace Engine
             return CreateRoom(true);
         }
 
-        public bool CreateFeature(string name)
+        public bool CreateFeature(string name, out Rect bounds)
         {
             switch (name)
             {
-                case "room": return MakeRoom();
+                case "room":
+                    return MakeRoom(out bounds);
                 default: throw new ArgumentException($"Unknown feature \"{name}\"");
             }
         }
 
-        private bool MakeRoom()
+        private bool MakeRoom(out Rect bounds)
         {
-            return CreateRoom() != Rect.Empty;
+            bounds = CreateRoom();
+            return bounds != Rect.Empty;
         }
 
         private Rect CreateRoom(bool startingRoom = false)
@@ -70,7 +73,6 @@ namespace Engine
             // === End room decoration code === 
             
             _rooms.Add(bounds);
-
             return bounds;
         }
 
@@ -89,7 +91,7 @@ namespace Engine
             {
                 // Place it wherever
                 x = Rng.Int(_writer.Bounds.Width);
-                y = Rng.Int(_writer.Bounds.Width);
+                y = Rng.Int(_writer.Bounds.Height);
             }
             
             Rect bounds = new Rect(x, y, width, height);
@@ -139,6 +141,7 @@ namespace Engine
             }
             
             // Drive a pathfinder to carve out the halls
+            Traversable traversable = Traversable.FourWayNeighbors | Traversable.Unconstrained;
             foreach (Prim.Edge edge in selectedEdges)
             {
                 Rect startRoom = (edge.U as Vertex<Rect>).Item;
@@ -146,10 +149,10 @@ namespace Engine
 
                 GridTile start = (GridTile) _writer.GetTile(new Vec2(startRoom.Center.x, startRoom.Center.y));
                 GridTile goal = (GridTile) _writer.GetTile(new Vec2(endRoom.Center.x, endRoom.Center.y));
-                
+
                 // Heuristic is Manhattan distance on a square grid
                 IList<IPathfindingNode> path = _writer.Graph.Pathfinder<AStarSearchAlgorithm>(start, goal,
-                    Traversable.FourWayNeighbors, (a, b) => 
+                    traversable, (a, b) => 
                         Math.Abs(a.Position.x - b.Position.x) + Math.Abs(a.Position.y - b.Position.y));
 
                 // Bail if the pathfinder failed to find a path, (NOTE: if it does, it seems like it should be a problem)

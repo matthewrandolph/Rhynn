@@ -1,20 +1,23 @@
 ﻿using System.Collections.Generic;
-using Engine;
+using Rhynn.Engine;
 
-namespace Util
+namespace Util.Pathfinding
 {
     public interface IPathfindingNode 
     {
+        TileType Type { get; set; }
         float PathCost { get; set; }
-        Vec2 Position { get; set; }
+        Vec2 Position { get; }
         
         IDictionary<IPathfindingNode, IPathfindingEdge> NeighborMap { get; }
 
         void AddNeighbor(IPathfindingNode neighbor, float weight, Direction direction);
         //void AddEdge(IPathfindingEdge edge);
 
-        bool IsTraversableTo(Traversable traversable, IPathfindingNode end);
-        void SetTraversableFlag(Traversable traversability);
-        void UnsetTraversableFlag(Traversable traversability);
+        bool IsTraversableTo(IPathfindingNode end, Traversable traversable);
+        void SetIncomingTraversableFlag(Traversable traversability);
+        void UnsetIncomingTraversableFlag(Traversable traversability);
+        void SetOutgoingTraversableFlag(Traversable traversability);
+        void UnsetOutgoingTraversableFlag(Traversable traversability);
     }
 }

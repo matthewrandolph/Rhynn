@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Engine
+namespace Rhynn.Engine
 {
     /// <summary>
     /// The Random Number Generator (i.e. the Random Number God)
@@ -119,7 +119,14 @@ namespace Engine
                 return center - range - 1 + x;
             }
         }
+
+        public static void SetSeed(int seed)
+        {
+            _random = new Random(seed);
+            Seed = seed;
+        }
         
         private static Random _random = new Random();
+        public static int Seed { get; private set; }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Engine;
+using Util.Pathfinding.SearchAlgorithms;
 
-namespace Util
+namespace Util.Pathfinding
 {
     /// <summary>
     /// Designates that the class has a pathfinding graph that can traversed by a pathfinding agent.

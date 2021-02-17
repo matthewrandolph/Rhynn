@@ -1,6 +1,4 @@
-﻿﻿﻿using System;
-
-namespace BlueRaja
+﻿﻿﻿ namespace Util.BlueRaja
 {
     public class FastPriorityQueueNode
     {

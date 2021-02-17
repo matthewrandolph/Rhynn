@@ -1,85 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Util;
+using Util.Pathfinding;
+using Rect = Util.Rect;
 
-namespace Engine
+namespace Rhynn.Engine.Generation
 {
     public class DelaunayGenerator : IBattleMapGenerator, IFeatureWriter<DelaunayGeneratorOptions>
     {
-        #region IBattleMapGenerator Members
-
-        public void Create(BattleMap map, object optionsObj)
+        public DelaunayGenerator(BattleMap map, object optionsObj)
         {
             _options = (DelaunayGeneratorOptions) optionsObj;
-
             _map = map;
+        }
+        
+        #region IBattleMapGenerator Members
 
+        /// <summary>
+        /// Generates a battle map using the settings in the DelaunayGeneratorOptions.
+        /// </summary>
+        public void Create()
+        {
+            // Avoids dud maps with only like one or two rooms. If that happens, throw it out and keep trying from
+            // scratch until we get one with at least a certain amount of carved open area.
             do
             {
                 _try++;
-
-                //_map.Entities.Clear();
-                //_map.Items.Clear();
-
-                MakeBattleMap(map.Bounds.Size);
-            } while (100 * _openCount / _map.Bounds.Area < _options.MinimumOpenPercent);
+                Reset();
+                MakeBattleMap();
+                
+            } while (100f * _openCount / _map.Bounds.Area < _options.MinimumOpenPercent);
         }
 
         #endregion
-
-        private void MakeBattleMap(Vec2 size)
+        
+        /// <summary>
+        /// Clear the battlemap and start with a fresh, empty map.
+        /// </summary>
+        private void Reset()
         {
-            // Clear the grid
+            //_map.Entities.Clear();
+            //_map.Items.Clear();
+            
             _openCount = 0;
-            _map.Tiles.Fill(position => new GridTile(TileType.Stone));
+            _map.Tiles.Fill(position => new GridTile(TileType.Stone, position));
             
             _factory = new DelaunayFeatureFactory(this);
-            
-            // Initialize the pathfinding edges to default value
+        }
+
+        private void MakeBattleMap()
+        {
+            // Initialize the pathfinding edges to default values
             InitializePathfindingGraph();
             
             // Create a starting room
             _startPosition = _factory.MakeStartingRoom().Center;
 
+            // Make a bunch of rooms
             for (int i = 0; i < _options.MaxTries; i++)
             {
-                // Make a bunch of rooms
-                var feature = "room";
-                _factory.CreateFeature(feature);
+                CreateRoom();
             }
 
             _factory.MakeHalls();
-            
-            foreach (Vec2 tileCoordinates in _map.Bounds)
-            {
-                IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
-                
-                // Assign pathfinding graph traversabilities
-                foreach (IPathfindingEdge edge in tile.NeighborMap.Values)
-                {
-                    GridTile start = (GridTile) edge.Start;
-                    GridTile end = (GridTile) edge.End;
-                    
-                    // Sets edges based on end node, irrespective of starting node. So this is valid:
-                    // TileType.Wall--Traversable.Land-->TileType.Floor
-                    // TODO: Restrict traversability based on neighboring nodes for diagonals
-                    // Ghosts can walk through all tiles (TODO: change this so that it must remain adjacent to any object’s exterior, and so cannot pass entirely through an object whose space is larger than its own)
-                    edge.SetTraversableFlag(Traversable.Incorporeal);
 
-                    if (start.Type == TileType.Floor && end.Type == TileType.Floor)
-                    {
-                        edge.SetTraversableFlag(Traversable.Land);
-                    }
-                }
-                
-                // Do a final pass to see how much battlemap we've carved
-                if (tile.NeighborMap.Any(entry => entry.Key.IsTraversableTo(Traversable.Land, entry.Value.End)))
-                {
-                    _openCount++;
-                }
-            }
+            CalculateTraversability();
+            _openCount = CalculateOpenCount();
         }
+
+        /// <summary>
+        /// Generates a single valid room.
+        /// </summary>
+        private void CreateRoom()
+        {
+            var feature = "room";
+            _factory.CreateFeature(feature, out Rect bounds);
+        }
+
 
         /// <summary>
         /// Creates a fresh pathfinding graph from the map bounds by generating empty edges connecting each tile.
@@ -112,6 +110,50 @@ namespace Engine
             }
         }
 
+        /// <summary>
+        /// Finalizes the traversability of the nodes within the battlemap.
+        /// </summary>
+        private void CalculateTraversability()
+        {
+            foreach (Vec2 tileCoordinates in _map.Bounds)
+            {
+                IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
+                
+                // Ghosts can walk through all tiles (TODO: change this so that it must remain adjacent to any object’s exterior, and so cannot pass entirely through an object whose space is larger than its own)
+                tile.SetIncomingTraversableFlag(Traversable.Incorporeal);
+
+                // Sets edges based on end node, irrespective of starting node. So this is valid:
+                // TileType.Wall--Traversable.Land-->TileType.Floor
+                if (tile.Type == TileType.Floor)
+                {
+                    tile.SetIncomingTraversableFlag(Traversable.Land);
+                }
+                
+                // TODO: Restrict traversability based on neighboring nodes for diagonals
+            }
+        }
+
+        /// <summary>
+        /// A final pass to see how much battlemap has been carved.
+        /// <returns>The number of tiles that is traversable to by land movement.</returns>
+        /// </summary>
+        private int CalculateOpenCount()
+        {
+            int openCount = 0;
+            foreach (Vec2 tileCoordinates in _map.Bounds)
+            {
+                IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
+
+                // Do a final pass to see how much battlemap we've carved
+                if (tile.NeighborMap.Keys.Any(neighbor => neighbor.IsTraversableTo(tile, Traversable.Land)))
+                {
+                    openCount++;
+                }
+            }
+
+            return openCount;
+        }
+
         #region IFeatureWriter Members
 
         public Rect Bounds => _map.Bounds;
@@ -126,19 +168,20 @@ namespace Engine
         /// <param name="rect">The rectangle to test.</param>
         /// <param name="exception">An optional exception position. If this position is not stone, it is still possible
         /// to use the rect. Used for the connector to a new feature.</param>
-        /// <remarks>It tests this by simply seeing if the outer edge of the rect touches a non-wall square.</remarks>
+        /// <remarks>It tests this by verifying each tile within the rect is a stone square. Originally only traced
+        /// the perimeter, but that was allowing rooms to fully enclose other rooms.</remarks>
         public bool IsOpen(Rect rect, Vec2? exception)
         {
             // must be totally in bounds
             if (!_map.Bounds.Contains(rect)) return false;
             
             // and not cover an existing feature
-            foreach (Vec2 edge in rect.Trace())
+            foreach (Vec2 tile in rect)
             {
                 // allow the exception
-                if (exception != null && (exception == edge)) continue;
+                if (exception != null && (exception == tile)) continue;
 
-                if (_map.Tiles[edge].Type != TileType.Stone) return false;
+                if (_map.Tiles[tile].Type != TileType.Stone) return false;
             }
 
             return true;
@@ -156,10 +199,11 @@ namespace Engine
 
         #endregion
 
-        private DelaunayGeneratorOptions _options;
+        private readonly DelaunayGeneratorOptions _options;
+        private readonly BattleMap _map;
+
         private int _try = 0;
         private int _openCount;
-        private BattleMap _map;
         private DelaunayFeatureFactory _factory;
         private Vec2 _startPosition;
     }

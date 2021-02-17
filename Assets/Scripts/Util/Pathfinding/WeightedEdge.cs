@@ -1,22 +1,25 @@
-﻿using Engine;
+﻿using Rhynn.Engine;
 
-namespace Util
+namespace Util.Pathfinding
 {
     public class WeightedEdge : IPathfindingEdge
     {
         #region IPathfindingEdge Members
 
-        public float Weight => _weight;
-        public IPathfindingNode Start => _start;
-        public IPathfindingNode End => _end;
-        public Direction Direction => _direction;
-        
+        public float Weight { get; }
+
+        public IPathfindingNode Start { get; }
+
+        public IPathfindingNode End { get; }
+
+        public Direction Direction { get; }
+
         public WeightedEdge(IPathfindingNode start, IPathfindingNode end, float weight, Direction direction)
         {
-            _start = start;
-            _end = end;
-            _weight = weight;
-            _direction = direction;
+            Start = start;
+            End = end;
+            Weight = weight;
+            Direction = direction;
         }
         
         public bool IsTraversable(Traversable traversable)
@@ -31,15 +34,11 @@ namespace Util
 
         public void UnsetTraversableFlag(Traversable traversable)
         {
-            _traversable &= traversable;
+            _traversable &= ~traversable;
         }
 
         #endregion
 
-        private float _weight;
-        private IPathfindingNode _start;
-        private IPathfindingNode _end;
-        private Direction _direction;
         private Traversable _traversable;
     }
 }

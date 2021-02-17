@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Engine;
+using Rhynn.Engine;
+using UnityEngine;
 
-namespace Util
+namespace Util.Pathfinding.SearchAlgorithms
 {
     /// <summary>
     /// Interface to represent graph searching algorithms used by a pathfinding agent.
@@ -63,7 +64,8 @@ namespace Util
 
         /// <summary>
         /// Checks if a given edge is traversable given the traversability flags passed in. Will check both movement
-        /// traversability as well as filter out edges based on the most permissive n-WayNeighbor's flag set.
+        /// traversability as well as filter out edges based on the most permissive n-WayNeighbor's flag set. If no
+        /// neighbor flag is set, it defaults to Traversable.AllNeighbors.
         /// </summary>
         /// <param name="edge">The edge attempting traversal.</param>
         /// <param name="agentTraversability">The agent's ability to traverse edges.</param>
@@ -82,14 +84,22 @@ namespace Util
                     return false;
                 }
             }
-            else if (edge.IsTraversable(Traversable.FourWayNeighbors))
+            else if (agentTraversability.HasFlag(Traversable.FourWayNeighbors))
             {
-                // Reject the diagonals and any special nodes (such as portals)
+                // Reject the intercardinal directions (diagonals) as well as any special nodes (such as portals)
                 if (!Direction.CardinalDirections.Contains(edge.Direction))
                 {
                     return false;
                 }
             }
+            else
+            {
+                // This is an implicit "has no neighbors flag" flag, which is just a lack of any neighbor flag at all.
+                // In this case we default to Traversable.AllNeighbors and continue.
+            }
+
+            // If the agent has Traversable.Unconstrained, then we return, no need to compare to edge traversability.
+            if (agentTraversability.HasFlag(Traversable.Unconstrained)) return true;
 
             // Check the agent's movement traversability compared to the edge traversability
             return edge.IsTraversable(agentTraversability);
@@ -103,6 +113,7 @@ namespace Util
         protected IList<IPathfindingNode> ReconstructPath(IDictionary<IPathfindingNode, IPathfindingNode> parentMap,
             IPathfindingNode start, IPathfindingNode goal)
         {
+            if (parentMap.Count == 0) throw new NoPathFoundException($"Cannot find a path between nodes {start.Position} and {goal.Position}");
             List<IPathfindingNode> path = new List<IPathfindingNode>();
             IPathfindingNode current = goal;
 
@@ -115,6 +126,11 @@ namespace Util
             path.Add(start);
             path.Reverse();
             return path;
+        }
+
+        public class NoPathFoundException : Exception
+        {
+            public NoPathFoundException(string message) : base (message) { }
         }
     }
 }

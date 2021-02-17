@@ -1,4 +1,4 @@
-﻿namespace Engine
+﻿namespace Rhynn.Engine
 {
     public class Game
     {
@@ -7,6 +7,11 @@
         public Game()
         {
             _battleMap = new BattleMap(this);
+        }
+
+        public void GenerateBattleMap()
+        {
+            _battleMap.Generate();
         }
 
         private BattleMap _battleMap;

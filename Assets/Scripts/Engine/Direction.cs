@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Util;
 
-namespace Engine
+namespace Rhynn.Engine
 {
     /// <summary>
     /// Represents one of the directions on a compass (or no direction).

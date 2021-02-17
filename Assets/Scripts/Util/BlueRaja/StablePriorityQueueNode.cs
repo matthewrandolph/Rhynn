@@ -1,4 +1,4 @@
-﻿﻿﻿namespace BlueRaja
+﻿﻿﻿namespace Util.BlueRaja
 {
     public class StablePriorityQueueNode : FastPriorityQueueNode
     {

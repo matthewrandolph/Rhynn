@@ -1,7 +1,7 @@
-﻿namespace Engine
+﻿namespace Rhynn.Engine
 {
     public interface IBattleMapGenerator
     {
-        void Create(BattleMap map, object options);
+        void Create();
     }
 }

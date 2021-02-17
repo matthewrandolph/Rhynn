@@ -1,9 +1,7 @@
-﻿﻿using System;
-
+﻿using System;
 using UnityEngine;
 
-
-namespace Graphs
+namespace Util
 {
     public class Vertex : IEquatable<Vertex>
     {

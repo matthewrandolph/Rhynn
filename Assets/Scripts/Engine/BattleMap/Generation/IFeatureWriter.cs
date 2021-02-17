@@ -1,7 +1,8 @@
 ﻿using JetBrains.Annotations;
 using Util;
+using Util.Pathfinding;
 
-namespace Engine
+namespace Rhynn.Engine.Generation
 {
     /// <summary>
     /// Interface used by a feature to actually apply the feature to a battlemap. The battlemap generator

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using Rhynn.Engine.Generation;
 using Util;
+using Util.Pathfinding;
 
-namespace Engine
+namespace Rhynn.Engine
 {
     [Serializable]
     public class BattleMap
@@ -21,26 +22,24 @@ namespace Engine
             
             // Instantiate items
             // Instantiate actors
+            
+            // fill battlemap with default tiles
+            _tiles.Fill(position => new GridTile(TileType.Stone, position));
         }
 
         public void Generate()
         {
             // Clear items
             // Clear actors
-            
-            // fill battlemap with default tiles
-            _tiles.Fill((position) => new GridTile(TileType.Stone));
-            
-            // generate the dungeon
-            IBattleMapGenerator generator;
-            object options = null;
 
-            generator = new DelaunayGenerator();
-            options = new DelaunayGeneratorOptions();
+            // generate the dungeon
+            DelaunayGeneratorOptions options = new DelaunayGeneratorOptions();
+            IBattleMapGenerator generator = new DelaunayGenerator(this, options);
+
+            generator.Create();
         }
 
         private readonly Grid2D<GridTile> _tiles;
-        
         
         private Game _game;
         

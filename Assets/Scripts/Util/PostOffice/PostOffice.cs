@@ -7,7 +7,7 @@ namespace Util.PostOffice
     /// An observer pattern class to communicate information between disparate domains. Be sure to define the message
     /// names within the Message enum. This class handles messages with no extra data attached to them.
     /// </summary>
-    public class PostOffice
+    public static class PostOffice
     {
         /// <summary>
         /// Add an event handler listening for a specific message that needs no data attached. Be sure to remove the
