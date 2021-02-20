@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Content;
+using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Rhynn.Engine;
 using Util;
@@ -8,80 +9,73 @@ namespace Tests
 {
     public class WeightedEdgeTests
     {
+        private IPathfindingNode start;
+        private IPathfindingNode end;
+        private WeightedEdge edge;
+
+        [SetUp]
+        public void Init()
+        {
+            start = new GridTile(Tiles.Floor, new Vec2(0, 0));
+            end = new GridTile(Tiles.Floor, new Vec2(1, 1));
+            edge = new WeightedEdge(start, end, 1, Direction.E);
+        }
+        
         [Test]
         public void SetTravsersableFlag_IsTraversableLand_True()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
+            Assert.IsFalse(edge.IsTraversable(Motility.Land));
             
-            Assert.IsFalse(edge.IsTraversable(Traversable.Land));
+            edge.SetMotilityFlag(Motility.Land);
             
-            edge.SetTraversableFlag(Traversable.Land);
-            
-            Assert.IsTrue(edge.IsTraversable(Traversable.Land));
+            Assert.IsTrue(edge.IsTraversable(Motility.Land));
         }
         
         [Test]
         public void SetTravsersableFlag_IsTraversableFly_True()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
+            Assert.IsFalse(edge.IsTraversable(Motility.Fly));
             
-            Assert.IsFalse(edge.IsTraversable(Traversable.Fly));
+            edge.SetMotilityFlag(Motility.Fly);
             
-            edge.SetTraversableFlag(Traversable.Fly);
-            
-            Assert.IsTrue(edge.IsTraversable(Traversable.Fly));
+            Assert.IsTrue(edge.IsTraversable(Motility.Fly));
         }
 
         [Test]
         public void SetTraversableFlag_OthersUnchanged_True()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
+            Assert.IsFalse(edge.IsTraversable(Motility.Land));
+            Assert.IsFalse(edge.IsTraversable(Motility.Fly));
+            Assert.IsFalse(edge.IsTraversable(Motility.Burrow));
             
-            Assert.IsFalse(edge.IsTraversable(Traversable.Land));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Fly));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Burrow));
+            edge.SetMotilityFlag(Motility.Land);
             
-            edge.SetTraversableFlag(Traversable.Land);
-            
-            Assert.IsFalse(edge.IsTraversable(Traversable.Fly));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Burrow));
+            Assert.IsFalse(edge.IsTraversable(Motility.Fly));
+            Assert.IsFalse(edge.IsTraversable(Motility.Burrow));
         }
         
         [Test]
         public void IsTraversible_IsTraversability_True()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
-
-            Assert.IsFalse(edge.IsTraversable(Traversable.Land));
+            Assert.IsFalse(edge.IsTraversable(Motility.Land));
             
-            edge.SetTraversableFlag(Traversable.Land);
+            edge.SetMotilityFlag(Motility.Land);
             
-            Assert.IsTrue(edge.IsTraversable(Traversable.Land));
+            Assert.IsTrue(edge.IsTraversable(Motility.Land));
         }
 
         [Test]
         public void IsTraversible_ContainsTraversability_True()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
-            Traversable traversable = Traversable.Land | Traversable.Fly;
+            Motility traversable = Motility.Land | Motility.Fly;
             
-            Assert.IsFalse(edge.IsTraversable(Traversable.Land));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Fly));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Burrow));
+            Assert.IsFalse(edge.IsTraversable(Motility.Land));
+            Assert.IsFalse(edge.IsTraversable(Motility.Fly));
+            Assert.IsFalse(edge.IsTraversable(Motility.Burrow));
             
-            edge.SetTraversableFlag(Traversable.Land);
-            edge.SetTraversableFlag(Traversable.Fly);
-            edge.SetTraversableFlag(Traversable.Burrow);
+            edge.SetMotilityFlag(Motility.Land);
+            edge.SetMotilityFlag(Motility.Fly);
+            edge.SetMotilityFlag(Motility.Burrow);
             
             Assert.IsTrue(edge.IsTraversable(traversable));
         }
@@ -89,47 +83,37 @@ namespace Tests
         [Test]
         public void IsTraversible_DoesNotContainTraversability_False()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
-            Traversable traversable = Traversable.Fly;
+            Motility traversable = Motility.Fly;
             
-            Assert.IsFalse(edge.IsTraversable(Traversable.Land));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Fly));
-            Assert.IsFalse(edge.IsTraversable(Traversable.Burrow));
+            Assert.IsFalse(edge.IsTraversable(Motility.Land));
+            Assert.IsFalse(edge.IsTraversable(Motility.Fly));
+            Assert.IsFalse(edge.IsTraversable(Motility.Burrow));
             
-            edge.SetTraversableFlag(Traversable.Land);
-            edge.SetTraversableFlag(Traversable.Burrow);
+            edge.SetMotilityFlag(Motility.Land);
+            edge.SetMotilityFlag(Motility.Burrow);
             
             Assert.IsFalse(edge.IsTraversable(traversable));
         }
 
         [Test]
         public void UnsetTraversableFlag_IsTraversable_False()
-        {            
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
+        {
+            edge.SetMotilityFlag(Motility.Everything);
             
-            edge.SetTraversableFlag(Traversable.Everything);
-            edge.UnsetTraversableFlag(Traversable.Land);
+            edge.UnsetMotilityFlag(Motility.Land);
 
-            Assert.IsFalse(edge.IsTraversable(Traversable.Land));
+            Assert.IsFalse(edge.IsTraversable(Motility.Land));
         }
 
         [Test]
         public void UnsetTraversableFlag_OthersUnchanged_True()
         {
-            IPathfindingNode start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            IPathfindingNode end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            WeightedEdge edge = new WeightedEdge(start, end, 1, Direction.E);
+            edge.SetMotilityFlag(Motility.Everything);
 
-            edge.SetTraversableFlag(Traversable.Everything);
+            edge.UnsetMotilityFlag(Motility.Land);
 
-            edge.UnsetTraversableFlag(Traversable.Land);
-
-            Assert.IsTrue(edge.IsTraversable(Traversable.Fly));
-            Assert.IsTrue(edge.IsTraversable(Traversable.Burrow));
+            Assert.IsTrue(edge.IsTraversable(Motility.Fly));
+            Assert.IsTrue(edge.IsTraversable(Motility.Burrow));
         }
     }
 }

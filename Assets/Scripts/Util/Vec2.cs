@@ -159,6 +159,8 @@ namespace Util
                 return (x * 397) ^ y;
             }
         }
+        
+        #endregion
 
         /// <summary>
         /// Gets whether the given vector is within a rectangle from (0, 0) to this vector (half-inclusive).
@@ -218,9 +220,5 @@ namespace Util
             
             return new Vec2(function(x), function(y));
         }
-        
-        #endregion
-
-
     }
 }

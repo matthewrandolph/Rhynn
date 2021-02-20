@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Rhynn.Engine.Generation;
 using Util;
 using Util.Pathfinding;
@@ -9,39 +10,40 @@ namespace Rhynn.Engine
     public class BattleMap
     {
         public Grid2D<GridTile> Tiles => _tiles;
-        
+
+        public List<Actor> Actors { get; }
+
         public Rect Bounds => new Rect(_tiles.Size);
 
-        public Game Game => _game;
-        
+        public Game Game { get; }
+
         public BattleMap(Game game, int width = 100, int height = 80)
         {
-            _game = game;
+            Game = game;
             
             _tiles = new Grid2D<GridTile>(width, height);
             
-            // Instantiate items
-            // Instantiate actors
+            // TODO: Instantiate items list
             
-            // fill battlemap with default tiles
-            _tiles.Fill(position => new GridTile(TileType.Stone, position));
+            Actors = new List<Actor>();
         }
 
         public void Generate()
         {
-            // Clear items
-            // Clear actors
+            // Items.Clear();
+            Actors.Clear();
 
             // generate the dungeon
             DelaunayGeneratorOptions options = new DelaunayGeneratorOptions();
             IBattleMapGenerator generator = new DelaunayGenerator(this, options);
 
             generator.Create();
+            
+            // Add the player
+            Actors.Add(Game.PlayerCharacter);
+            Game.PlayerCharacter.Position = generator.StartPosition;
         }
 
         private readonly Grid2D<GridTile> _tiles;
-        
-        private Game _game;
-        
     }
 }

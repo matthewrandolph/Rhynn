@@ -22,23 +22,23 @@ namespace Util.Pathfinding
             Direction = direction;
         }
         
-        public bool IsTraversable(Traversable traversable)
+        public bool IsTraversable(Motility motility)
         {
-            return (_traversable & traversable) != 0;
+            return _motility.Contains(motility);
         }
 
-        public void SetTraversableFlag(Traversable traversable)
+        public void SetMotilityFlag(Motility motility)
         {
-            _traversable |= traversable;
+            _motility |= motility;
         }
 
-        public void UnsetTraversableFlag(Traversable traversable)
+        public void UnsetMotilityFlag(Motility motility)
         {
-            _traversable &= ~traversable;
+            _motility -= motility;
         }
 
         #endregion
 
-        private Traversable _traversable;
+        private Motility _motility = Motility.None;
     }
 }

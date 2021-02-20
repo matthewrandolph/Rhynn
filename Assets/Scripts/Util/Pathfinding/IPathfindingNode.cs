@@ -14,10 +14,10 @@ namespace Util.Pathfinding
         void AddNeighbor(IPathfindingNode neighbor, float weight, Direction direction);
         //void AddEdge(IPathfindingEdge edge);
 
-        bool IsTraversableTo(IPathfindingNode end, Traversable traversable);
-        void SetIncomingTraversableFlag(Traversable traversability);
-        void UnsetIncomingTraversableFlag(Traversable traversability);
-        void SetOutgoingTraversableFlag(Traversable traversability);
-        void UnsetOutgoingTraversableFlag(Traversable traversability);
+        bool IsTraversableTo(IPathfindingNode end, Motility motility);
+        void SetIncomingTraversableFlag(Motility motility);
+        void UnsetIncomingTraversableFlag(Motility motility);
+        void SetOutgoingTraversableFlag(Motility motility);
+        void UnsetOutgoingTraversableFlag(Motility motility);
     }
 }

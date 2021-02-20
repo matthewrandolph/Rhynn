@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Content;
 using UnityEngine;
 using Util;
 using Util.Pathfinding;
@@ -50,13 +51,13 @@ namespace Rhynn.Engine.Generation
             // Place the room
             foreach (Vec2 position in bounds)
             {
-                _writer.SetTile(position, TileType.Floor);
+                _writer.SetTile(position, Tiles.Floor);
             }
             
             // And the walls surrounding the room
             foreach (Vec2 position in bounds.Trace())
             {
-                _writer.SetTile(position, TileType.Wall);
+                _writer.SetTile(position, Tiles.Wall);
             }
             
             // === Room decoration code here ===
@@ -141,7 +142,7 @@ namespace Rhynn.Engine.Generation
             }
             
             // Drive a pathfinder to carve out the halls
-            Traversable traversable = Traversable.FourWayNeighbors | Traversable.Unconstrained;
+            Motility motility = Motility.FourWayNeighbors | Motility.Unconstrained;
             foreach (Prim.Edge edge in selectedEdges)
             {
                 Rect startRoom = (edge.U as Vertex<Rect>).Item;
@@ -152,19 +153,19 @@ namespace Rhynn.Engine.Generation
 
                 // Heuristic is Manhattan distance on a square grid
                 IList<IPathfindingNode> path = _writer.Graph.Pathfinder<AStarSearchAlgorithm>(start, goal,
-                    traversable, (a, b) => 
+                    motility, (a, b) => 
                         Math.Abs(a.Position.x - b.Position.x) + Math.Abs(a.Position.y - b.Position.y));
 
-                // Bail if the pathfinder failed to find a path, (NOTE: if it does, it seems like it should be a problem)
+                // Bail if the pathfinder failed to find a path (NOTE: if it does, it seems like it should be a problem)
                 if (path == null) continue;
                 foreach (IPathfindingNode step in path)
                 {
-                    _writer.SetTile(step.Position, TileType.Floor);
+                    _writer.SetTile(step.Position, Tiles.Floor);
                     foreach (IPathfindingNode neighbor in step.NeighborMap.Keys)
                     {
-                        if (((GridTile) _writer.GetTile(neighbor.Position)).Type == TileType.Stone)
+                        if (((GridTile) _writer.GetTile(neighbor.Position)).Type == Tiles.Stone)
                         {
-                            _writer.SetTile(neighbor.Position, TileType.Wall);
+                            _writer.SetTile(neighbor.Position, Tiles.Wall);
                         }
                     }
                 }

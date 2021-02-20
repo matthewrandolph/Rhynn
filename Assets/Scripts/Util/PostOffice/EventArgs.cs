@@ -1,6 +1,6 @@
 ﻿namespace Util.PostOffice
 {
-    public class MessageArgs<T>
+    public class EventArgs<T>
     {
         public T Value;
     }

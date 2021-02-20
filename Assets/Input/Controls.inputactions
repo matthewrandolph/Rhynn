@@ -1,0 +1,58 @@
+{
+    "name": "Controls",
+    "maps": [
+        {
+            "name": "Gameplay",
+            "id": "330604ce-c948-4817-8875-f138537b8c43",
+            "actions": [
+                {
+                    "name": "Select",
+                    "type": "Button",
+                    "id": "2a0ee1b2-fa76-4ed9-b7a2-41b9187f5dd4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Move",
+                    "type": "Button",
+                    "id": "52afde30-8cab-494c-94cc-7e131785abdc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "bd33e2ec-d5b8-4de9-9540-2173fed6157a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Default",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6d0be594-5b60-441a-9786-6206cbcb7a02",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Default",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Default",
+            "bindingGroup": "Default",
+            "devices": []
+        }
+    ]
+}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Util;
 using Util.Pathfinding;
 
@@ -39,18 +40,28 @@ namespace Rhynn.Engine
         }
 
         /// <summary>
+        /// Whether its possible for an <see cref="Actor"/> with the given motility to enter this tile.
+        /// </summary>
+        /// <param name="motility"></param>
+        /// <returns></returns>
+        public bool CanEnter(Motility motility)
+        {
+            return Type.CanEnter(motility);
+        }
+
+        /// <summary>
         /// Identifies if a given node is a neighbor of this node and is traversable.
         /// </summary>
         /// <remarks>This does not perform pathfinding. It only looks at its direct neighbors.</remarks>
         /// <param name="end">The neighbor node to traverse to.</param>
-        /// <param name="traversable">The agent's traversability.</param>
+        /// <param name="motility">The agent's motility.</param>
         /// <returns>Whether or not the agent can traverse along an edge to the given node given its
-        ///     current traversability.</returns>
-        public bool IsTraversableTo(IPathfindingNode end, Traversable traversable)
+        ///     current motility.</returns>
+        public bool IsTraversableTo(IPathfindingNode end, Motility motility)
         {
             if (!_neighbors.TryGetValue(end, out IPathfindingEdge edge)) return false;
 
-            return edge.IsTraversable(traversable);
+            return edge.IsTraversable(motility);
         }
 
         /// <summary>
@@ -58,14 +69,14 @@ namespace Rhynn.Engine
         /// although its okay if one of them is set to Traversable.None.
         /// </summary>
         /// <remarks>This modifies "incoming" edges only. Outgoing edges are unaffected.</remarks>
-        /// <param name="traversable">The traversability flags to add.</param>
-        public void SetOutgoingTraversableFlag(Traversable traversable)
+        /// <param name="motility">The motility flags to add.</param>
+        public void SetOutgoingTraversableFlag(Motility motility)
         {
-            // Update edges pointing to neighbors (i.e outgoing edges) that the end tile has new traversability
+            // Update edges pointing to neighbors (i.e outgoing edges) that the end tile has new motility
             foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in _neighbors)
             {
                 IPathfindingEdge neighborEdge = entry.Value;
-                neighborEdge.SetTraversableFlag(traversable);
+                neighborEdge.SetMotilityFlag(motility);
             }
         }
 
@@ -74,14 +85,14 @@ namespace Rhynn.Engine
         /// way, although its okay if one of them is set to Traversable.None.
         /// </summary>
         /// <remarks>This modifies "incoming" edges only. Outgoing edges are unaffected.</remarks>
-        /// <param name="traversable"></param>
-        public void UnsetOutgoingTraversableFlag(Traversable traversable)
+        /// <param name="motility"></param>
+        public void UnsetOutgoingTraversableFlag(Motility motility)
         {
             // Update edges pointing to neighbors (i.e outgoing edges) that the end tile has new traversability
             foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in _neighbors)
             {
                 IPathfindingEdge neighborEdge = entry.Value;
-                neighborEdge.UnsetTraversableFlag(traversable);
+                neighborEdge.UnsetMotilityFlag(motility);
             }
         }
         
@@ -90,14 +101,14 @@ namespace Rhynn.Engine
         /// although its okay if one of them is set to Traversable.None.
         /// </summary>
         /// <remarks>This modifies "incoming" edges only. Outgoing edges are unaffected.</remarks>
-        /// <param name="traversable">The traversability flags to add.</param>
-        public void SetIncomingTraversableFlag(Traversable traversable)
+        /// <param name="motility">The motility flags to add.</param>
+        public void SetIncomingTraversableFlag(Motility motility)
         {
             // Update neighbor's edges (i.e incoming edges) that this tile has new traversability
             foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in _neighbors)
             {
                 IPathfindingNode neighborNode = entry.Key;
-                neighborNode.SetOutgoingTraversableFlag(traversable);
+                neighborNode.SetOutgoingTraversableFlag(motility);
             }
         }
 
@@ -106,14 +117,14 @@ namespace Rhynn.Engine
         /// way, although its okay if one of them is set to Traversable.None.
         /// </summary>
         /// <remarks>This modifies "incoming" edges only. Outgoing edges are unaffected.</remarks>
-        /// <param name="traversable"></param>
-        public void UnsetIncomingTraversableFlag(Traversable traversable)
+        /// <param name="motility"></param>
+        public void UnsetIncomingTraversableFlag(Motility motility)
         {
             // Update neighbor's edges (i.e incoming edges) that this tile has new traversability
             foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in _neighbors)
             {
                 IPathfindingNode neighborNode = entry.Key;
-                neighborNode.UnsetOutgoingTraversableFlag(traversable);
+                neighborNode.UnsetOutgoingTraversableFlag(motility);
             }
         }
 
@@ -124,11 +135,60 @@ namespace Rhynn.Engine
         private Vec2 _position;
     }
 
-    public enum TileType
+    public struct TileType
     {
-        Unknown,
-        Floor,
-        Wall,
-        Stone
+        public readonly String Name;
+        public readonly Motility Motility;
+        public readonly int SpriteIndex;
+
+        public TileType(string name, Motility motility, int spriteIndex)
+        {
+            Name = name;
+            Motility = motility;
+            SpriteIndex = spriteIndex;
+        }
+
+        public bool IsWalkable => Motility.Contains(Motility.Land);
+        public bool CanEnter(Motility motility) => motility.Contains(Motility);
+
+        #region Operators
+
+        public static bool operator ==(TileType type1, TileType type2)
+        {
+            //if (type1 is null) return type2 is null;
+            return type1.Equals(type2);
+        }
+        
+        public static bool operator !=(TileType type1, TileType type2)
+        {
+            //if (type1 is null) return !(type2 is null);
+            return !type1.Equals(type2);
+        }
+        
+        #endregion
+
+        #region IEquatable<Motility> Members
+
+        public bool Equals(TileType other)
+        {
+            //if (ReferenceEquals(null, other)) return false;
+            //if (ReferenceEquals(this, other)) return true;
+            return Name == other.Name && Motility == other.Motility;
+        }
+        
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            //if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((TileType) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode() ^ Motility.GetHashCode();
+        }
+        
+        #endregion
     }
 }

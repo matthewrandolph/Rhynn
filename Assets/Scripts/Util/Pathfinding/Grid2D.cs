@@ -86,28 +86,28 @@ namespace Util.Pathfinding
         }
 
         public IList<IPathfindingNode> Pathfinder<TSearchAlgorithm>(IPathfindingNode start, IPathfindingNode goal, 
-            Traversable agentTraversability) where TSearchAlgorithm : ISearchAlgorithm, new()
+            Motility agentMotility) where TSearchAlgorithm : ISearchAlgorithm, new()
         {
             var searchAlgorithm = new TSearchAlgorithm();
             InitializeCosts(start);
-            return searchAlgorithm.Search(start, goal, agentTraversability);
+            return searchAlgorithm.Search(start, goal, agentMotility);
         }
 
         public IList<IPathfindingNode> Pathfinder<TSearchAlgorithm>(IPathfindingNode start, IPathfindingNode goal, 
-            Traversable agentTraversability, Func<IPathfindingNode, IPathfindingNode, float> heuristic) 
+            Motility agentMotility, Func<IPathfindingNode, IPathfindingNode, float> heuristic) 
             where TSearchAlgorithm : ISearchAlgorithm, new()
         {
             var searchAlgorithm = new TSearchAlgorithm();
             InitializeCosts(start);
-            return searchAlgorithm.Search(start, goal, agentTraversability, heuristic);
+            return searchAlgorithm.Search(start, goal, agentMotility, heuristic);
         }
 
         public IDictionary<IPathfindingNode, IPathfindingNode> Pathfinder<TFloodFillAlgorithm>(IPathfindingNode start, 
-            float searchDepth, Traversable agentTraversability) where TFloodFillAlgorithm : IFloodFillAlgorithm, new()
+            float searchDepth, Motility agentMotility) where TFloodFillAlgorithm : IFloodFillAlgorithm, new()
         {
             var fillAlgorithm = new TFloodFillAlgorithm();
             InitializeCosts(start);
-            return fillAlgorithm.Fill(start, searchDepth, agentTraversability);
+            return fillAlgorithm.Fill(start, searchDepth, agentMotility);
         }
 
         private void InitializeCosts(IPathfindingNode start)
@@ -116,6 +116,8 @@ namespace Util.Pathfinding
             {
                 node.PathCost = Mathf.Infinity;
             }
+
+            start.PathCost = 0;
         }
 
         #endregion

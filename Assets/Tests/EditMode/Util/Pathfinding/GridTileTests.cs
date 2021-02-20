@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Content;
 using NUnit.Framework;
 using Rhynn.Engine;
 using UnityEngine;
@@ -11,63 +12,58 @@ namespace Tests
 {
     public class GridTileTests
     {
+        private GridTile start;
+        private GridTile end;
+
+        [SetUp]
+        public void Init()
+        {
+            start = new GridTile(Tiles.Floor, new Vec2(0, 0));
+            end = new GridTile(Tiles.Floor, new Vec2(1, 1));
+            
+            start.AddNeighbor(end, 1f, Direction.E);
+            end.AddNeighbor(start, 1f, Direction.E);
+        }
+        
         [Test]
         public void IsTraversableTo_DefaultIsTraversable_False()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
         }
         
         [Test]
         public void IsTraversableTo_IsTraversable_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            end.SetIncomingTraversableFlag(Motility.Land);
             
-            end.SetIncomingTraversableFlag(Traversable.Land);
-            
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Land));
         }
         
         [Test]
         public void IsTraversableTo_ContainsTraversable_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-            Traversable traversable = Traversable.Land | Traversable.Burrow | Traversable.Climb;
+            Motility traversable = Motility.Land | Motility.Burrow | Motility.Climb;
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
             
             end.SetIncomingTraversableFlag(traversable);
             
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Land));
         }
         
         [Test]
         public void IsTraversibleTo_DoesNotContainTraversability_False()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-            Traversable traversable = Traversable.Fly;
+            Motility traversable = Motility.Fly;
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Burrow));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Burrow));
             
-            end.SetIncomingTraversableFlag(Traversable.Land);
-            end.SetIncomingTraversableFlag(Traversable.Burrow);
+            end.SetIncomingTraversableFlag(Motility.Land);
+            end.SetIncomingTraversableFlag(Motility.Burrow);
             
             Assert.IsFalse(start.IsTraversableTo(end, traversable));
         }
@@ -75,161 +71,127 @@ namespace Tests
         [Test]
         public void SetIncomingTravsersableFlag_SetSingleTraversableFlag_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            end.SetIncomingTraversableFlag(Motility.Land);
             
-            end.SetIncomingTraversableFlag(Traversable.Land);
-            
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Land));
         }
         
         [Test]
         public void SetIncomingTravsersableFlag_SetMultipleTraversableFlags_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-            Traversable traversable = Traversable.Land | Traversable.Fly;
+            Motility traversable = Motility.Land | Motility.Fly;
             
             Assert.IsFalse(start.IsTraversableTo(end, traversable));
             
             end.SetIncomingTraversableFlag(traversable);
 
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Land));
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Fly));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Land));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Fly));
         }
         
         [Test]
         public void SetIncomingTravsersableFlag_OthersUnchanged_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Burrow));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Burrow));
             
-            end.SetIncomingTraversableFlag(Traversable.Land);
+            end.SetIncomingTraversableFlag(Motility.Land);
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Burrow));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Burrow));
         }
 
         [Test]
         public void UnsetIncomingTraversableFlag_IsTraversable_False()
-        {            
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-            
-            end.SetIncomingTraversableFlag(Traversable.Everything);
-            end.UnsetIncomingTraversableFlag(Traversable.Land);
+        {
+            end.SetIncomingTraversableFlag(Motility.Everything);
+            end.UnsetIncomingTraversableFlag(Motility.Land);
 
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
         }
 
         [Test]
         public void UnsetIncomingTraversableFlag_OthersUnchanged_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
+            end.SetIncomingTraversableFlag(Motility.Everything);
 
-            end.SetIncomingTraversableFlag(Traversable.Everything);
+            end.UnsetIncomingTraversableFlag(Motility.Land);
 
-            end.UnsetIncomingTraversableFlag(Traversable.Land);
-
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Burrow));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Burrow));
         }
         
         [Test]
         public void SetOutgoingTravsersableFlag_SetSingleTraversableFlag_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            start.SetOutgoingTraversableFlag(Motility.Land);
             
-            start.SetOutgoingTraversableFlag(Traversable.Land);
-            
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Land));
         }
         
         [Test]
         public void SetOutgoingTravsersableFlag_SetMultipleTraversableFlags_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-            Traversable traversable = Traversable.Land | Traversable.Fly;
+            Motility traversable = Motility.Land | Motility.Fly;
             
             Assert.IsFalse(start.IsTraversableTo(end, traversable));
             
             start.SetOutgoingTraversableFlag(traversable);
 
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Land));
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Fly));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Land));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Fly));
         }
         
         [Test]
         public void SetOutgoingTravsersableFlag_OthersUnchanged_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Burrow));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Burrow));
             
-            start.SetOutgoingTraversableFlag(Traversable.Land);
+            start.SetOutgoingTraversableFlag(Motility.Land);
             
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Burrow));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Burrow));
         }
 
         [Test]
         public void UnsetOutgoingTraversableFlag_IsTraversable_False()
-        {            
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
-            
-            start.SetOutgoingTraversableFlag(Traversable.Everything);
-            start.UnsetOutgoingTraversableFlag(Traversable.Land);
+        {
+            start.SetOutgoingTraversableFlag(Motility.Everything);
+            start.UnsetOutgoingTraversableFlag(Motility.Land);
 
-            Assert.IsFalse(start.IsTraversableTo(end, Traversable.Land));
+            Assert.IsFalse(start.IsTraversableTo(end, Motility.Land));
         }
 
         [Test]
         public void UnsetOutgoingTraversableFlag_OthersUnchanged_True()
         {
-            GridTile start = new GridTile(TileType.Floor, new Vec2(0, 0));
-            GridTile end = new GridTile(TileType.Floor, new Vec2(1, 1));
-            start.AddNeighbor(end, 1f, Direction.E);
-            end.AddNeighbor(start, 1f, Direction.E);
+            start.SetOutgoingTraversableFlag(Motility.Everything);
 
-            start.SetOutgoingTraversableFlag(Traversable.Everything);
+            start.UnsetOutgoingTraversableFlag(Motility.Land);
 
-            start.UnsetOutgoingTraversableFlag(Traversable.Land);
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Fly));
+            Assert.IsTrue(start.IsTraversableTo(end, Motility.Burrow));
+        }
 
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Fly));
-            Assert.IsTrue(start.IsTraversableTo(end, Traversable.Burrow));
+        [Test]
+        public void CanEnter_FlagSet_True()
+        {
+            start.SetIncomingTraversableFlag(Motility.Land);
+            
+            Assert.IsTrue(start.CanEnter(Motility.Land));
+        }
+        
+        [Test]
+        public void CanEnter_FlagNotSet_False()
+        {
+            Assert.IsFalse(start.CanEnter(Motility.Swim));
         }
     }
 }

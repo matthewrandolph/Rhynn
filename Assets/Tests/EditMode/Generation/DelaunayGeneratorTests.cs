@@ -1,4 +1,5 @@
 ﻿using System;
+using Content;
 using NUnit.Framework;
 using Rhynn.Engine;
 using Rhynn.Engine.Generation;
@@ -7,12 +8,8 @@ using Util;
 namespace Tests
 {
     [TestFixture]
-    public class DelaunayGeneratorFixture
+    public class DelaunayGeneratorTests
     {
-        // Assign
-        // Act
-        // Assert
-
         public Game Game;
         public BattleMap BattleMap;
 
@@ -43,7 +40,7 @@ namespace Tests
         public void IsOpen_OverlapsExisting_False()
         {
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
-            BattleMap.Tiles[2, 2] = new GridTile(TileType.Wall, new Vec2(2, 2));
+            BattleMap.Tiles[2, 2] = new GridTile(Tiles.Wall, new Vec2(2, 2));
 
             Assert.IsFalse(generator.IsOpen(new Rect(3,3), null));
         }
@@ -52,7 +49,7 @@ namespace Tests
         public void IsOpen_NewContainsExisting_False()
         {
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
-            BattleMap.Tiles[4, 4] = new GridTile(TileType.Wall, new Vec2(4, 4));
+            BattleMap.Tiles[4, 4] = new GridTile(Tiles.Wall, new Vec2(4, 4));
             
             Assert.IsFalse(generator.IsOpen(new Rect(0, 0, 10,10), null));
         }
@@ -63,7 +60,7 @@ namespace Tests
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
             foreach (var tile in new Rect(10, 10))
             {
-                BattleMap.Tiles[tile.x, tile.y] = new GridTile(TileType.Wall, new Vec2(tile.x, tile.y));
+                BattleMap.Tiles[tile.x, tile.y] = new GridTile(Tiles.Wall, new Vec2(tile.x, tile.y));
             }
             
             Assert.IsFalse(generator.IsOpen(new Rect(3, 3, 2, 2), null));
@@ -73,7 +70,7 @@ namespace Tests
         public void IsOpen_CoversExistingButIsInException_True()
         {
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
-            BattleMap.Tiles[2, 2] = new GridTile(TileType.Wall, new Vec2(2, 2));
+            BattleMap.Tiles[2, 2] = new GridTile(Tiles.Wall, new Vec2(2, 2));
 
             Assert.IsTrue(generator.IsOpen(new Rect(3,3), new Vec2(2, 2)));
         }
@@ -118,11 +115,11 @@ namespace Tests
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
             Vec2 tileCoordinates = Vec2.One;
 
-            Assert.AreEqual(BattleMap.Tiles[tileCoordinates].Type, TileType.Stone);
+            Assert.AreEqual(BattleMap.Tiles[tileCoordinates].Type, Tiles.Stone);
             
-            generator.SetTile(tileCoordinates, TileType.Wall);
+            generator.SetTile(tileCoordinates, Tiles.Wall);
             
-            Assert.AreEqual(BattleMap.Tiles[tileCoordinates].Type, TileType.Wall);
+            Assert.AreEqual(BattleMap.Tiles[tileCoordinates].Type, Tiles.Wall);
         }
     }
 }

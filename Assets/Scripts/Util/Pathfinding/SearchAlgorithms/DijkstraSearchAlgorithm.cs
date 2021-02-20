@@ -6,7 +6,7 @@ namespace Util.Pathfinding.SearchAlgorithms
     public class DijkstraSearchAlgorithm : SearchAlgorithmBase
     {
         public override IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal,
-            Traversable traversability)
+            Motility motility)
         {
             Dictionary<IPathfindingNode, IPathfindingNode> parentMap = new Dictionary<IPathfindingNode, IPathfindingNode>();
             SimplePriorityQueue<IPathfindingNode> frontier = new SimplePriorityQueue<IPathfindingNode>();
@@ -24,7 +24,7 @@ namespace Util.Pathfinding.SearchAlgorithms
                     IPathfindingEdge edge = entry.Value;
                     IPathfindingNode neighbor = entry.Key;
 
-                    if (!IsTraversable(edge, traversability)) continue;
+                    if (!IsTraversable(edge, motility)) continue;
 
                     float newCost = current.PathCost + edge.Weight;
                     float neighborCost = neighbor.PathCost;

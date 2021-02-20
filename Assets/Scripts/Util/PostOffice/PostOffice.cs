@@ -125,7 +125,7 @@ namespace Util.PostOffice
     /// <summary>
     /// An observer pattern class to communicate information between disparate domains. Be sure to define the message
     /// names within the Message enum. This class handles messages with two units of data attached to it. For anything
-    /// more complicated than sending a single extra value for 'U', create a class that inherits from MessageArgs to
+    /// more complicated than sending a single extra value for 'U', create a class that inherits from EventArgs to
     /// pass into the message.
     /// </summary>
     public class PostOffice<T, U>
@@ -136,11 +136,11 @@ namespace Util.PostOffice
         /// </summary>
         /// <param name="eventType">The event to listen for.</param>
         /// <param name="handler">The method/function to call when the event is raised.</param>
-        public static void AddObserver(Message eventType, Action<T,MessageArgs<U>> handler)
+        public static void AddObserver(Message eventType, Action<T,EventArgs<U>> handler)
         {
-            if (!_messageTable.TryGetValue(eventType, out List<Action<T, MessageArgs<U>>> handlers))
+            if (!_messageTable.TryGetValue(eventType, out List<Action<T, EventArgs<U>>> handlers))
             {
-                handlers = new List<Action<T, MessageArgs<U>>>();
+                handlers = new List<Action<T, EventArgs<U>>>();
                 _messageTable.Add(eventType, handlers);
             }
 
@@ -155,9 +155,9 @@ namespace Util.PostOffice
         /// </summary>
         /// <param name="eventType">The event to listen for.</param>
         /// <param name="handler">The method/function to call when the event is raised.</param>
-        public static void RemoveObserver(Message eventType, Action<T, MessageArgs<U>> handler)
+        public static void RemoveObserver(Message eventType, Action<T, EventArgs<U>> handler)
         {
-            if (!_messageTable.TryGetValue(eventType, out List<Action<T, MessageArgs<U>>> handlers)) return;
+            if (!_messageTable.TryGetValue(eventType, out List<Action<T, EventArgs<U>>> handlers)) return;
 
             if (handlers.Contains(handler))
             {
@@ -172,16 +172,16 @@ namespace Util.PostOffice
         /// <param name="eventType">The event to raise.</param>
         /// <param name="firstParameter">The first data to send with the message</param>
         /// <param name="secondParameter">A second set of data to include with the message</param>
-        public static void SendEvent(Message eventType, T firstParameter, MessageArgs<U> secondParameter)
+        public static void SendEvent(Message eventType, T firstParameter, EventArgs<U> secondParameter)
         {
-            if (!_messageTable.TryGetValue(eventType, out List<Action<T, MessageArgs<U>>> handlers)) return;
+            if (!_messageTable.TryGetValue(eventType, out List<Action<T, EventArgs<U>>> handlers)) return;
 
-            foreach (Action<T, MessageArgs<U>> handler in handlers)
+            foreach (Action<T, EventArgs<U>> handler in handlers)
             {
                 handler(firstParameter, secondParameter);
             }
         }
         
-        private static Dictionary<Message, List<Action<T, MessageArgs<U>>>> _messageTable = new Dictionary<Message, List<Action<T, MessageArgs<U>>>>();
+        private static Dictionary<Message, List<Action<T, EventArgs<U>>>> _messageTable = new Dictionary<Message, List<Action<T, EventArgs<U>>>>();
     }
 }

@@ -2,21 +2,23 @@
 using UnityEngine;
 using Util;
 
-namespace Rhynn.App
+namespace UI.Graphics
 {
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(MeshCollider))]
-    public class BattleMap : MonoBehaviour
+    public class BattleMapGfx : MonoBehaviour
     {
         [SerializeField] private float tileSize = 1.0f;
 
-        [Header("Tile Textures")] [SerializeField]
-        private Texture2D terrainTileSet;
+        [Header("Tile Textures")] 
+        [SerializeField] private Texture2D terrainTileSet;
 
         [SerializeField] private int tileResolution;
         [SerializeField] private FilterMode tileTextureFilterMode;
         [SerializeField] private TextureWrapMode tileTextureWrapMode;
+
+        public float TileSize => tileSize;
 
         public void Init(Game game)
         {
@@ -31,7 +33,7 @@ namespace Rhynn.App
         }
 
         /// <summary>
-        /// Constructs a plain mesh from the <see cref="Engine.BattleMap"/>.Bounds.Size data in the Game object.
+        /// Constructs a plain mesh from the <see cref="Rhynn.Engine.BattleMap"/>.Bounds.Size data in the Game object.
         /// </summary>
         /// TODO: Consider changing mesh generation to create individual meshes for each tile instead of one giant mesh.
         private void BuildMesh()
@@ -113,7 +115,7 @@ namespace Rhynn.App
             {
                 for (int x = 0; x < _dimensions.x; x++)
                 {
-                    Color[] pixelColors = tiles[(int) _game.BattleMap.Tiles[x, y].Type];
+                    Color[] pixelColors = tiles[_game.BattleMap.Tiles[x, y].Type.SpriteIndex];
                     texture.SetPixels(x * tileResolution, y * tileResolution, tileResolution, 
                         tileResolution, pixelColors);
                 }

@@ -12,10 +12,10 @@ namespace Util.Pathfinding
         /// </summary>
         /// <param name="start">The start node.</param>
         /// <param name="searchDepth">The cost of the path at which to stop searching along that path.</param>
-        /// <param name="traversability">The traversability of the agent. Any edges that don't contain one of
+        /// <param name="motility">The motility of the agent. Any edges that don't contain one of
         ///     these flags is thrown out.</param>
         /// <returns>All nodes where the traversal cost is less than or equal to searchDepth.</returns>
         IDictionary<IPathfindingNode, IPathfindingNode> Fill(IPathfindingNode start, float searchDepth,
-            Traversable traversability);
+            Motility motility);
     }
 }

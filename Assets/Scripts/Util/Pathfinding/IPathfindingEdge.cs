@@ -28,10 +28,10 @@ namespace Util.Pathfinding
         /// </summary>
         Direction Direction { get; }
 
-        bool IsTraversable(Traversable traversability);
+        bool IsTraversable(Motility motility);
 
-        void SetTraversableFlag(Traversable traversability);
+        void SetMotilityFlag(Motility motility);
 
-        void UnsetTraversableFlag(Traversable traversability);
+        void UnsetMotilityFlag(Motility motility);
     }
 }

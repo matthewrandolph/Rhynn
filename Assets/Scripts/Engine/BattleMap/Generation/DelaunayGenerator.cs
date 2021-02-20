@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Content;
 using UnityEngine;
 using Util;
 using Util.Pathfinding;
@@ -13,9 +14,13 @@ namespace Rhynn.Engine.Generation
         {
             _options = (DelaunayGeneratorOptions) optionsObj;
             _map = map;
+
+            Reset();
         }
-        
+
         #region IBattleMapGenerator Members
+        
+        public Vec2 StartPosition { get; private set; }
 
         /// <summary>
         /// Generates a battle map using the settings in the DelaunayGeneratorOptions.
@@ -40,11 +45,11 @@ namespace Rhynn.Engine.Generation
         /// </summary>
         private void Reset()
         {
-            //_map.Entities.Clear();
+            _map.Actors.Clear();
             //_map.Items.Clear();
             
             _openCount = 0;
-            _map.Tiles.Fill(position => new GridTile(TileType.Stone, position));
+            _map.Tiles.Fill(position => new GridTile(Tiles.Stone, position));
             
             _factory = new DelaunayFeatureFactory(this);
         }
@@ -55,7 +60,7 @@ namespace Rhynn.Engine.Generation
             InitializePathfindingGraph();
             
             // Create a starting room
-            _startPosition = _factory.MakeStartingRoom().Center;
+            StartPosition = _factory.MakeStartingRoom().Center;
 
             // Make a bunch of rooms
             for (int i = 0; i < _options.MaxTries; i++)
@@ -120,13 +125,13 @@ namespace Rhynn.Engine.Generation
                 IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
                 
                 // Ghosts can walk through all tiles (TODO: change this so that it must remain adjacent to any object’s exterior, and so cannot pass entirely through an object whose space is larger than its own)
-                tile.SetIncomingTraversableFlag(Traversable.Incorporeal);
+                tile.SetIncomingTraversableFlag(Motility.Incorporeal);
 
                 // Sets edges based on end node, irrespective of starting node. So this is valid:
                 // TileType.Wall--Traversable.Land-->TileType.Floor
-                if (tile.Type == TileType.Floor)
+                if (tile.Type == Tiles.Floor)
                 {
-                    tile.SetIncomingTraversableFlag(Traversable.Land);
+                    tile.SetIncomingTraversableFlag(Motility.Land);
                 }
                 
                 // TODO: Restrict traversability based on neighboring nodes for diagonals
@@ -145,7 +150,7 @@ namespace Rhynn.Engine.Generation
                 IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
 
                 // Do a final pass to see how much battlemap we've carved
-                if (tile.NeighborMap.Keys.Any(neighbor => neighbor.IsTraversableTo(tile, Traversable.Land)))
+                if (tile.NeighborMap.Keys.Any(neighbor => neighbor.IsTraversableTo(tile, Motility.Land)))
                 {
                     openCount++;
                 }
@@ -181,7 +186,7 @@ namespace Rhynn.Engine.Generation
                 // allow the exception
                 if (exception != null && (exception == tile)) continue;
 
-                if (_map.Tiles[tile].Type != TileType.Stone) return false;
+                if (_map.Tiles[tile].Type != Tiles.Stone) return false;
             }
 
             return true;
@@ -205,6 +210,5 @@ namespace Rhynn.Engine.Generation
         private int _try = 0;
         private int _openCount;
         private DelaunayFeatureFactory _factory;
-        private Vec2 _startPosition;
     }
 }

@@ -1,7 +1,11 @@
-﻿namespace Rhynn.Engine
+﻿using Util;
+
+namespace Rhynn.Engine
 {
     public interface IBattleMapGenerator
     {
+        Vec2 StartPosition { get; }
+
         void Create();
     }
 }
