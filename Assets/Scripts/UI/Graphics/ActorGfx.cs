@@ -20,7 +20,6 @@ namespace UI.Graphics
         public void OnMoved(object sender, ValueChangeEventArgs<Vec2> eventArgs)
         {
             Vector3 worldPosition = new Vector3(eventArgs.New.x, 0, eventArgs.New.y);
-            Debug.Log($"OnMoved() invoked. Moving actor to {worldPosition}");
             gameObject.transform.position = worldPosition;
         }
 

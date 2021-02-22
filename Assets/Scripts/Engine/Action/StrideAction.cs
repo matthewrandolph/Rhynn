@@ -19,8 +19,6 @@ namespace Rhynn.Engine
 
         protected override ActionResult OnPerform()
         {
-            //TileType tileType = BattleMap.Tiles[Destination].Type;
-            
             // See if we can stand there
             if (!Actor.CanOccupy(Destination))
             {

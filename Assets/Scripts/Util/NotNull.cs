@@ -72,7 +72,7 @@ namespace Util
         /// <summary>
         /// Creates a new wrapper around the given reference.
         /// </summary>
-        /// <remarks>Explictly calling the constructor is rarely needed. Usually the implicit cast is simpler.</remarks>
+        /// <remarks>Explicitly calling the constructor is rarely needed. Usually the implicit cast is simpler.</remarks>
         /// <param name="maybeNull">The reference to wrap.</param>
         /// <exception cref="ArgumentNullException">If <c>value</c> is <c>null</c>.</exception>
         public NotNull(T maybeNull)

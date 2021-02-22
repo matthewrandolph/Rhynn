@@ -1102,6 +1102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleMapPrefab: {fileID: 1957183524296973857, guid: a3afc4bfb418d6e45bb405cafd8feb17, type: 3}
   playerPrefab: {fileID: 2474737641877622653, guid: d97fc455919001b4190017c0ad1c26ce, type: 3}
+  enemyPrefab: {fileID: 2474737641877622653, guid: 7ac74c6695fa2d543a966c1737f5413e, type: 3}
   awaitingUserInputMenu: {fileID: 4510978773116128332}
   moveMenu: {fileID: 4408592174177450943}
 --- !u!1 &8489612530473212103

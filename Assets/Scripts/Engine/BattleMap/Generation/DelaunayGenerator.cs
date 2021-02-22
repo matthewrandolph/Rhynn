@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Content;
+using Rhynn.Engine.AI;
 using UnityEngine;
 using Util;
 using Util.Pathfinding;
@@ -200,6 +201,23 @@ namespace Rhynn.Engine.Generation
         public void SetTile(Vec2 position, TileType type)
         {
             _map.Tiles[position].Type = type;
+        }
+
+        public void Populate(Vec2 position)
+        {
+            // TODO: Expand this to populate for NPCs with non-typical motilities (flying creatures, sea monsters, etc).
+            if (_map.Tiles[position].CanEnter(Motility.Land))
+            {
+                // Place an NPC TODO: Check that tile is not occupied
+                Actor actor = new Actor(_map.Game, position, 0);
+                actor.SetAI<WanderAimlesslyAI>();
+                AddActor(actor);
+            }
+        }
+
+        public void AddActor(Actor actor)
+        {
+            _map.Actors.Add(actor);
         }
 
         #endregion

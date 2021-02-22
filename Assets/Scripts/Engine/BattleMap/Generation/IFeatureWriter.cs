@@ -22,6 +22,10 @@ namespace Rhynn.Engine.Generation
         void SetTile(Vec2 position, TileType type);
 
         IPathfindingNode GetTile(Vec2 position);
+
+        void Populate(Vec2 position);
+
+        void AddActor(Actor actor);
         
         TGeneratorOptions Options { get; }
     }

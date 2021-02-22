@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Rhynn.Engine;
 using Rhynn.Input;
 using UI.Graphics;
@@ -13,6 +14,7 @@ namespace Rhynn.UI
     {
         [SerializeField] private GameObject battleMapPrefab;
         [SerializeField] private GameObject playerPrefab;
+        [SerializeField] private GameObject enemyPrefab;
         
         [Header("Action Menus")]
         [SerializeField] private Screen awaitingUserInputMenu;
@@ -36,7 +38,7 @@ namespace Rhynn.UI
         protected void OnEnable() =>Controls.Gameplay.Enable();
         protected void OnDisable() => Controls.Gameplay.Disable();
 
-        private void Update() => ProcessGame();
+        private void Update() => ProcessGame(); // TODO: Eventually needs to handle animations that take longer than 1 frame. Maybe use DOTween's OnComplete() method.
 
         public void AddGame(Game game)
         {
@@ -53,15 +55,28 @@ namespace Rhynn.UI
             BattleMapGfx = Instantiate(battleMapPrefab).GetComponent<BattleMapGfx>();
             BattleMapGfx.Init(Game);
 
-            // Create Actor visuals
+            // Create Actor visuals TODO: Temp for testing
             // TODO: Foreach actor, create new GameObjects and AddComponent<> the required components
             // TODO: Load actor meshes/textures/sprites from Content instead of referenced in the UnityEditor
-            GameObject player = Instantiate(playerPrefab,
-                new Vector3(Game.PlayerCharacter.Position.x, 0, Game.PlayerCharacter.Position.y), 
-                Quaternion.identity);
-            ActorGfx playerGfx = player.GetComponent<ActorGfx>();
-            playerGfx.Init(Game.PlayerCharacter);
-            
+            foreach (Actor actor in Game.BattleMap.Actors)
+            {
+                ActorGfx actorGfx;
+                if (actor.PlayerId == 0)
+                {
+                    GameObject actorGameObject = Instantiate(enemyPrefab,
+                        new Vector3(actor.Position.x, 0, actor.Position.y), Quaternion.identity);
+                    actorGfx = actorGameObject.GetComponent<ActorGfx>();
+                }
+                else
+                {
+                    GameObject actorGameObject = Instantiate(playerPrefab,
+                        new Vector3(actor.Position.x, 0, actor.Position.y), Quaternion.identity);
+                    actorGfx = actorGameObject.GetComponent<ActorGfx>();
+                }
+                
+                actorGfx.Init(actor);
+            }
+
             // Set the starting camera position
             Camera.main.transform.position = 
                 new Vector3(Game.PlayerCharacter.Position.x, 10, Game.PlayerCharacter.Position.y);
@@ -80,21 +95,22 @@ namespace Rhynn.UI
             _state = uiState;
             _state.OnEnter();
         }
-/*
 
-        private IEnumerator ProcessGame()
+
+/*        private IEnumerator ProcessGame()
         {
             while (true)
             {
-                yield return Game.ProcessGameLogic();;
+                yield return Game.ProcessGameLogic();
+                yield return new WaitForSeconds(1f);
             }
             
             // ... continue here
         }*/
         
-        private void ProcessGame()
+        public void ProcessGame()
         {
-            Game.ProcessGameLogic();;
+            Game.ProcessGameLogic();
 
             // ... continue here
         }

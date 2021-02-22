@@ -11,8 +11,6 @@ namespace Rhynn.UI
         /// </summary>
         public void Stride()
         {
-            Debug.Log("Stride() invoked.");
-            
             gameScreen.TransitionState(new MoveState(gameScreen));
         }
     }

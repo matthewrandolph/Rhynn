@@ -11,7 +11,9 @@ namespace Rhynn.UI
     {
         public override void OnEnter()
         {
-            
+            // TODO: subscribe to NeedsAction event in every Actor in Game.Actors that is controlled by the player
+            // For now just immediately returning to the AwaitingUserInput state.
+            Screen.TransitionState(new AwaitingInputState(Screen));
         }
 
         public override void OnExit()

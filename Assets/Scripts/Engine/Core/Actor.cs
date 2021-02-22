@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Rhynn.Engine.AI;
 using UnityEngine;
 using Util;
 using Util.Pathfinding;
@@ -29,39 +31,35 @@ namespace Rhynn.Engine
             }
         }
         
-        public int PlayerId { get; set; } // An id is generated for each human player. AI-controlled Actors are 0.
+        public int PlayerId { get; } // An id is generated for each human player. AI-controlled Actors are 0.
 
         public float Speed => 6; // TODO: base land speed for now, will probably end up an array of movement speeds or a dictionary or something to include other movement type speeds. Base speeds are calculated from racial base speeds as well as magical effects, equipment, etc.
         
         public bool IsAlive => true; // TODO: When health and stats are added, return whether the Actor's health is
                                      // below negative their Constitution score. NOTE: what to do about undead/creatures
                                      // that are destroyed at 0? Perhaps compare it to a deathHealthThreshold defined in race?
+                                     // PF2e has a neat dying mechanic that prevents auto-death.
+                                     
+        public bool NeedsInput => _actorAI.NeedsUserInput;
 
-        public bool NeedsInput
-        {
-            get
-            {
-                if (PlayerId == 0) return false;
-                
-                // TODO: Include a check here to confirm the actor can perform the behaviour. if not, null out the behaviour.
-                
-                return _behaviour == null;
-            }
-        }
+        public int ActionsPerTurn => 1;
+        public int RemainingActions { get; set; }
 
         public Motility Motility => Motility.Land; // TODO: Motility is calculated from racial base motility as well as magical effects, equipment, etc.
-        
+
         public bool CanOccupy(Vec2 position)
         {
             GridTile tile = Game.BattleMap.Tiles[position];
             return tile.CanEnter(Motility);
         }
 
-        public Actor(Game game, Vec2 position, int playerId)
+        public Actor(Game game, Vec2 position, int playerId) 
         {
             Game = game;
             Position = position;
             PlayerId = playerId;
+            
+            _actorAI = new ActorAI(this);
         }
 
         /*public IEnumerable<Action> StartTurn()
@@ -69,16 +67,14 @@ namespace Rhynn.Engine
             yield return null;
         }*/
 
-        public IEnumerable<Action> TakeTurn()
+        public void StartTurn()
         {
-            Debug.Log("TakeTurn() invoked.");
-            // get the next action
-            Action turnAction = _behaviour.NextAction();
+            RemainingActions = ActionsPerTurn;
+        }
 
-            if (turnAction != null) 
-                yield return turnAction;
-            
-            WaitForInput();
+        public Action TakeTurn()
+        {
+            return _actorAI.NextAction().First();
         }
 
         /*public IEnumerable<Action> EndTurn()
@@ -101,25 +97,26 @@ namespace Rhynn.Engine
             handler?.Invoke(this, args);
         }
 
-        private void WaitForInput()
+        public void SetAI<TDecisionMakingAlgorithm>() where TDecisionMakingAlgorithm : IDecisionMakingAlgorithm, new()
         {
-            // TODO: Ask the AI assigned to control this actor for input here, rename to GetNextAction().
-            // For example, ActorAI<WaitForUserInputAI>.GetNextBehaviour() would just set behaviour to null.
-            // ActorAI<WanderAimlesslyAI> would set it to OneShotBehaviour<StrideAction> targeting a random location repeatedly.
-            _behaviour = null;
+            var algorithm = new TDecisionMakingAlgorithm();
+            algorithm.SetActor(this);
+            _actorAI.SetAlgorithm(algorithm);
         }
 
-        public void SetNextAction(NotNull<Action> action)
+        /// <summary>
+        /// Sets the <see cref="Actor"/>'s <see cref="Activities">Activity</see>.
+        /// </summary>
+        /// <remarks>
+        /// An <see cref="Action"/> can be implicitly converted to the parameter of <see cref="SetActivity"/>.
+        /// </remarks>
+        /// <param name="activity">The <see cref="Activities">Activity</see> or <see cref="Action"/> to perform.</param>
+        public void SetActivity(NotNull<List<Action>> activity)
         {
-            SetBehaviour(new OneShotBehaviour(action));
-        }
-
-        public void SetBehaviour(NotNull<Behaviour> behaviour)
-        {
-            _behaviour = behaviour;
+            _actorAI.SetActivity(activity);
         }
         
-        private Behaviour _behaviour;
+        private ActorAI _actorAI;
         private Vec2 _position;
     }
 }

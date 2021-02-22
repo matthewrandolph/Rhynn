@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageReport scope="Summary">
+  <Summary>
+    <Generatedon>2/20/2021 - 7:03:01 PM</Generatedon>
+    <Parser>OpenCoverParser</Parser>
+    <Assemblies>2</Assemblies>
+    <Classes>75</Classes>
+    <Files>67</Files>
+    <Coveredlines>2239</Coveredlines>
+    <Uncoveredlines>2021</Uncoveredlines>
+    <Coverablelines>4260</Coverablelines>
+    <Totallines>9452</Totallines>
+    <Linecoverage>52.5</Linecoverage>
+    <Coveredbranches>0</Coveredbranches>
+    <Totalbranches>0</Totalbranches>
+  </Summary>
+  <Coverage>
+    <Assembly name="EditMode" classes="12" coverage="99.3" coveredlines="936" coverablelines="942" totallines="1950" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Tests.DelaunayFeatureFactoryTests" coverage="0" coveredlines="0" coverablelines="5" totallines="50" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.DelaunayGeneratorTests" coverage="100" coveredlines="59" coverablelines="59" totallines="125" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.DijkstraFloodFillTests" coverage="96.8" coveredlines="31" coverablelines="32" totallines="75" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.GameTests" coverage="100" coveredlines="5" coverablelines="5" totallines="22" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.GameUIStateTests" coverage="100" coveredlines="66" coverablelines="66" totallines="122" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.GridTileTests" coverage="100" coveredlines="98" coverablelines="98" totallines="197" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.MotilityTests" coverage="100" coveredlines="41" coverablelines="41" totallines="92" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.Rect2Tests" coverage="100" coveredlines="155" coverablelines="155" totallines="345" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.RectFixture" coverage="100" coveredlines="164" coverablelines="164" totallines="343" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.SearchAlgorithmBaseTests" coverage="100" coveredlines="45" coverablelines="45" totallines="91" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.Vec2Fixture" coverage="100" coveredlines="214" coverablelines="214" totallines="369" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Tests.WeightedEdgeTests" coverage="100" coveredlines="58" coverablelines="58" totallines="119" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+    <Assembly name="GameAssembly" classes="63" coverage="39.2" coveredlines="1303" coverablelines="3318" totallines="9196" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Content.Tiles" coverage="85.7" coveredlines="18" coverablelines="21" totallines="52" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.App.Program" coverage="0" coveredlines="0" coverablelines="4" totallines="20" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Action" coverage="0" coveredlines="0" coverablelines="25" totallines="62" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.ActionResult" coverage="0" coveredlines="0" coverablelines="12" totallines="36" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Actor" coverage="48" coveredlines="24" coverablelines="50" totallines="124" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.BattleMap" coverage="100" coveredlines="18" coverablelines="18" totallines="49" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Direction" coverage="25.6" coveredlines="21" coverablelines="82" totallines="174" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Event" coverage="0" coveredlines="0" coverablelines="6" totallines="47" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Game" coverage="15.4" coveredlines="11" coverablelines="71" totallines="153" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.GameResult" coverage="0" coveredlines="0" coverablelines="8" totallines="47" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Generation.DelaunayFeatureFactory" coverage="95.8" coveredlines="93" coverablelines="97" totallines="189" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Generation.DelaunayGenerator" coverage="97.8" coveredlines="93" coverablelines="95" totallines="223" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Generation.DelaunayGeneratorOptions" coverage="100" coveredlines="17" coverablelines="17" totallines="37" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.GridTile" coverage="100" coveredlines="49" coverablelines="49" totallines="194" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.OneShotBehaviour" coverage="0" coveredlines="0" coverablelines="10" totallines="26" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.Rng" coverage="55.5" coveredlines="20" coverablelines="36" totallines="132" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.StrideAction" coverage="0" coveredlines="0" coverablelines="18" totallines="48" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Engine.TileType" coverage="83.3" coveredlines="20" coverablelines="24" totallines="194" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.Input.Controls" coverage="0" coveredlines="0" coverablelines="66" totallines="179" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.AnimatingState" coverage="16.6" coveredlines="1" coverablelines="6" totallines="26" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.AwaitingInputState" coverage="0" coveredlines="0" coverablelines="13" totallines="41" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.AwaitingUserInputMenu" coverage="0" coveredlines="0" coverablelines="3" totallines="17" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.Control" coverage="0" coveredlines="0" coverablelines="8" totallines="25" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.GameScreen" coverage="0" coveredlines="0" coverablelines="36" totallines="104" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.GameUIState" coverage="70.8" coveredlines="17" coverablelines="24" totallines="60" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.MoveMenu" coverage="0" coveredlines="0" coverablelines="4" totallines="19" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.MoveState" coverage="3.5" coveredlines="1" coverablelines="28" totallines="75" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.NullState" coverage="0" coveredlines="0" coverablelines="1" totallines="10" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.Screen" coverage="2.4" coveredlines="1" coverablelines="41" totallines="82" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.UserInterface" coverage="0" coveredlines="0" coverablelines="52" totallines="101" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Rhynn.UI.WelcomeScreen" coverage="0" coveredlines="0" coverablelines="8" totallines="34" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="UI.Graphics.ActorGfx" coverage="0" coveredlines="0" coverablelines="11" totallines="29" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="UI.Graphics.BattleMapGfx" coverage="0" coveredlines="0" coverablelines="86" totallines="154" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.FastPriorityQueue[T]" coverage="0" coveredlines="0" coverablelines="296" totallines="592" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.FastPriorityQueueNode" coverage="0" coveredlines="0" coverablelines="3" totallines="23" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.GenericPriorityQueue[TItem,TPriority]" coverage="62.8" coveredlines="188" coverablelines="299" totallines="601" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.GenericPriorityQueueNode[TPriority]" coverage="100" coveredlines="4" coverablelines="4" totallines="29" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.SimplePriorityQueue[TItem,TPriority]" coverage="19.8" coveredlines="57" coverablelines="287" totallines="588" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.SimplePriorityQueue[TItem]" coverage="33.3" coveredlines="1" coverablelines="3" totallines="588" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.StablePriorityQueue[T]" coverage="0" coveredlines="0" coverablelines="295" totallines="586" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.BlueRaja.StablePriorityQueueNode" coverage="0" coveredlines="0" coverablelines="1" totallines="10" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Delaunay2D" coverage="81.9" coveredlines="141" coverablelines="172" totallines="289" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Edge" coverage="26.9" coveredlines="7" coverablelines="26" totallines="94" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.FSMState" coverage="0" coveredlines="0" coverablelines="36" totallines="303" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.FSMSystem" coverage="0" coveredlines="0" coverablelines="61" totallines="303" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.NotNull[T]" coverage="0" coveredlines="0" coverablelines="11" totallines="87" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.Grid2D[T]" coverage="87.7" coveredlines="43" coverablelines="49" totallines="128" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.Motility" coverage="82.6" coveredlines="38" coverablelines="46" totallines="141" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.SearchAlgorithms.AStarSearchAlgorithm" coverage="100" coveredlines="26" coverablelines="26" totallines="46" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.SearchAlgorithms.DijkstraFloodFill" coverage="100" coveredlines="24" coverablelines="24" totallines="42" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.SearchAlgorithms.DijkstraSearchAlgorithm" coverage="0" coveredlines="0" coverablelines="26" totallines="46" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.SearchAlgorithms.SearchAlgorithmBase" coverage="87.1" coveredlines="34" coverablelines="39" totallines="136" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Pathfinding.WeightedEdge" coverage="95.2" coveredlines="20" coverablelines="21" totallines="44" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.PostOffice.PostOffice" coverage="0" coveredlines="0" coverablelines="26" totallines="187" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.PostOffice.PostOffice[T,U]" coverage="0" coveredlines="0" coverablelines="26" totallines="187" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.PostOffice.PostOffice[T]" coverage="0" coveredlines="0" coverablelines="26" totallines="187" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.PostOffice.ValueChangeEventArgs[T]" coverage="71.4" coveredlines="5" coverablelines="7" totallines="14" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Prim" coverage="88.3" coveredlines="53" coverablelines="60" totallines="112" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Rect" coverage="64.2" coveredlines="97" coverablelines="151" totallines="328" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Rect2" coverage="38.4" coveredlines="58" coverablelines="151" totallines="330" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Vec2" coverage="100" coveredlines="90" coverablelines="90" totallines="224" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Vertex" coverage="47" coveredlines="8" coverablelines="17" totallines="94" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Util.Vertex[T]" coverage="55.5" coveredlines="5" coverablelines="9" totallines="94" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+  </Coverage>
+</CoverageReport>

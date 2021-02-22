@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Rhynn.Engine.AI;
 using UnityEngine;
 using Util;
 
@@ -10,18 +11,18 @@ namespace Rhynn.Engine
         public BattleMap BattleMap { get; }
         
         public Actor PlayerCharacter { get; private set; }
-        
-        /// <summary>
-        /// Gets the <see cref="Actor"/> who created the root <see cref="Action"/> that is currently being processed.
-        /// Will be <c>null</c> outside of the main Action processing loop.
-        /// </summary>
-        public Actor ActingActor { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="Actor"/> who's turn it is, regardless of whether they are currently taking an action or
         /// if they are waiting for input.
         /// </summary>
         public Actor CurrentActor { get; private set; }
+        
+        /// <summary>
+        /// Gets the <see cref="Actor"/> who owns the <see cref="Action"/> currently being processed by the Game. This
+        /// may not be the <see cref="CurrentActor"/> in the case of a reaction.
+        /// </summary>
+        public Actor ActingActor { get; private set; }
 
         public Game()
         {
@@ -31,6 +32,7 @@ namespace Rhynn.Engine
         public void GenerateBattleMap()
         {
             PlayerCharacter = new Actor(this, Vec2.Zero, 1);
+            PlayerCharacter.SetAI<WaitForUserInputAI>();
 
             BattleMap.Generate();
         }
@@ -59,25 +61,26 @@ namespace Rhynn.Engine
                 {
                     CurrentActor = BattleMap.Actors[actorIndex];
 
-                    // actor.StartTurn(); - perhaps make this a "foreach GameResult in" loop as well. This is used for any "start of turn" effects, like buffs running out, etc.
-                    // while (actor.RemainingActions > 0)
+                    CurrentActor.StartTurn(); //TODO: Add start of turn stuff. Perhaps make this a "foreach GameResult in" loop as well. This is used for any "start of turn" effects, like buffs running out, etc.
                     
-                    // bail if we need to wait for the UI or AI to provide an action
-                    while (CurrentActor.NeedsInput)
-                        yield return new GameResult(false);
-
-                    // get the actor's actions
-                    foreach (Action action in CurrentActor.TakeTurn())
+                    while (CurrentActor.RemainingActions > 0)
                     {
-                        // process it and everything it leads to
-                        foreach (GameResult result in ProcessAction(action))
+                        // bail if we need to wait for the UI or AI to provide an action
+                        while (CurrentActor.NeedsInput)
+                            yield return new GameResult(false);
+
+                        // get the actor's action
+                        Action action = CurrentActor.TakeTurn();
                         {
-                            yield return result;
+                            // process it and everything it leads to
+                            foreach (GameResult result in ProcessAction(action))
+                            {
+                                yield return result;
+                            }
                         }
                     }
                     
-                    // end while
-                    // actor.EndTurn(); - perhaps make this a "foreach GameResult in" loop as well. This is used for any "end of turn" effects, such as enemy debuffs running out, etc.
+                    // actor.EndTurn(); - TODO: add end of turn stuff. Perhaps make this a "foreach GameResult in" loop as well. This is used for any "end of turn" effects, such as enemy debuffs running out, etc.
                     
                     // actor was killed, so it will be removed from the collection and the next one shifted up.
                     if (!CurrentActor.IsAlive)
@@ -86,23 +89,23 @@ namespace Rhynn.Engine
                     }
                 }
                 
-                // Process all of the items and other things that need to have something happen each turn
+                // TODO: Process all of the items and other things that need to have something happen each turn
                 
-                // Turn/time increment (advance 1 turn/6 seconds, etc).
+                // TODO: Turn/time increment (advance 1 turn/6 seconds, etc).
             }
         }
 
         private IEnumerable<GameResult> ProcessAction(Action theAction)
         {
-            Debug.Log($"ProcessAction() invoked with action {theAction}");
             Queue<Action> actions = new Queue<Action>();
             actions.Enqueue(theAction);
-
+            
             while (actions.Count > 0)
             {
                 Action action = actions.Peek();
                 
                 // track who owns this sequence of actions
+                Debug.Log($"The ActingActor for action \"{action}\" is \"{action.Actor}\"");
                 ActingActor = action.Actor;
 
                 ActionResult result = action.Perform(actions);

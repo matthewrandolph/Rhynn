@@ -70,7 +70,7 @@ namespace Rhynn.Engine.Generation
             // place the connectors
             //AddRoomConnectors(bounds);
 
-            //Populate(bounds, 20, 20);
+            Populate(bounds, 20, 20);
             // === End room decoration code === 
             
             _rooms.Add(bounds);
@@ -172,6 +172,22 @@ namespace Rhynn.Engine.Generation
             }
 
             return true;
+        }
+
+        private void Populate(Rect bounds, int monsterDensity, int itemDensity)
+        {
+            // TODO: For testing, place one NPC in each room. For real this should probably be more random!
+            //foreach (Rect room in _rooms)
+            {
+                int xOffset = Rng.Int(bounds.Width);
+                int yOffset = Rng.Int(bounds.Height);
+
+                Vec2 location = bounds.Position + new Vec2(xOffset, yOffset);
+                
+                _writer.Populate(location);
+            }
+            
+            
         }
 
         private IList<Rect> _rooms;

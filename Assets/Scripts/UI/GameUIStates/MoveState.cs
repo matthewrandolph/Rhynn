@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Rhynn.Engine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Util;
+using Util.Pathfinding;
+using Util.Pathfinding.SearchAlgorithms;
 
 namespace Rhynn.UI
 {
@@ -39,23 +42,32 @@ namespace Rhynn.UI
         {
             // Get the selected tile from the selection indicator/mouse
             Vector2 pointerPosition = Pointer.current.position.ReadValue();
-            Debug.Log($"Clicked on point {pointerPosition}");
             Ray ray = Camera.main.ScreenPointToRay(pointerPosition);
 
-            if (Screen.BattleMapGfx.GetComponent<Collider>().Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity))
-            {
-                Debug.Log($"RaycastHit hit the battlemap collider at world point {hitInfo.point}");
-                Vector3 pointerCoordinates = Screen.BattleMapGfx.transform.InverseTransformPoint(hitInfo.point);
-                Debug.Log($"RaycastHit hit the battlemap collider at local point {pointerCoordinates}");
+            if (!Screen.BattleMapGfx.GetComponent<Collider>()
+                .Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity)) { return; }
+            
+            Vector3 pointerCoordinates = Screen.BattleMapGfx.transform.InverseTransformPoint(hitInfo.point);
 
-                int x = Mathf.FloorToInt(pointerCoordinates.x / Screen.BattleMapGfx.TileSize);
-                int z = Mathf.FloorToInt(pointerCoordinates.z / Screen.BattleMapGfx.TileSize);
-                Vec2 tileSelected = new Vec2(x, z);
-
-                Screen.Game.CurrentActor.SetNextAction(new StrideAction(Screen.Game.CurrentActor, tileSelected));
+            int x = Mathf.FloorToInt(pointerCoordinates.x / Screen.BattleMapGfx.TileSize);
+            int z = Mathf.FloorToInt(pointerCoordinates.z / Screen.BattleMapGfx.TileSize);
+            Vec2 tileSelected = new Vec2(x, z);
                 
-                // Send the StrideAction to the engine for processing
-            }
+            // Do some basic verification that the tile wont be rejected by the engine. No point in telling the
+            // engine if it is just going to throw the action away.
+            Actor actor = Screen.Game.CurrentActor;
+            IPathfindingGraph tiles = Screen.Game.BattleMap.Tiles;
+                
+            IPathfindingNode position = tiles.GetNodeAt(actor.Position);
+            IDictionary<IPathfindingNode, IPathfindingNode> moveableTiles = 
+                tiles.Pathfinder<DijkstraFloodFill>(position, actor.Speed, actor.Motility);
+            IPathfindingNode destination = tiles.GetNodeAt(tileSelected);
+
+            if (!moveableTiles.ContainsKey(destination)) return;
+            
+            // Send the StrideAction to the engine for processing
+            Screen.Game.CurrentActor.SetActivity(new StrideAction(Screen.Game.CurrentActor, tileSelected));
+            Screen.TransitionState(new AnimatingState(Screen));
         }
         
         private Action<InputAction.CallbackContext> _onSelectAction;
