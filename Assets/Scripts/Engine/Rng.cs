@@ -7,6 +7,12 @@ namespace Rhynn.Engine
     /// </summary>
     public static class Rng
     {
+        public static void SetSeed(int seed)
+        {
+            _random = new Random(seed);
+            Seed = seed;
+        }
+        
         /// <summary>
         /// Gets a random int between 0 and max (half-inclusive).
         /// </summary>
@@ -57,6 +63,30 @@ namespace Rhynn.Engine
             if (max < min) throw new ArgumentOutOfRangeException("The max must be min or greater.");
 
             return Float(max - min) + min;
+        }
+
+        /// <summary>
+        /// Rolls the given number of dice with the given number of sides on each die and returns the sum. The values
+        /// on each side range from 1 to the number of sides.
+        /// </summary>
+        /// <param name="dice">Number of dice to roll.</param>
+        /// <param name="sides">Number of sides on each die.</param>
+        /// <returns>The sum of the dice rolled.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Throws if <see cref="dice"/> or <see cref="sides"/> are
+        /// less than or equal to 0.</exception>
+        public static int Roll(int dice, int sides)
+        {
+            if (dice <= 0) throw new ArgumentOutOfRangeException(nameof(dice), "The argument \"dice\" must be greater than zero.");
+            if (sides <= 0) throw new ArgumentOutOfRangeException(nameof(dice), "The argument \"sides\" must be greater than zero.");
+
+            int total = 0;
+
+            for (int i = 0; i < dice; i++)
+            {
+                total += Int(1, sides + 1);
+            }
+
+            return total;
         }
 
         /// <summary>
@@ -120,12 +150,17 @@ namespace Rhynn.Engine
             }
         }
 
-        public static void SetSeed(int seed)
+        /// <summary>
+        /// Returns the value rolled of a typical "check"-type roll such as an attack roll, saving throw, or skill check.
+        /// </summary>
+        /// <remarks>The typical "check"-type roll is currently implemented as 3d8-3, returning a result between 0 and 21.</remarks>
+        /// <param name="bonus">The bonus or penalty to add to (or subtract from) the roll.</param>
+        /// <returns>The value rolled</returns>
+        public static int RollCheck(int bonus)
         {
-            _random = new Random(seed);
-            Seed = seed;
+            return Roll(3, 8) - 3 + bonus;
         }
-        
+
         private static Random _random = new Random();
         public static int Seed { get; private set; }
     }

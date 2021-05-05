@@ -59,7 +59,15 @@ namespace Rhynn.Engine
         /// Enumerates the four main cardinal compass directions
         /// </summary>
         public static IList<Direction> CardinalDirections => new List<Direction> {N, S, E, W};
+        
+        /// <summary>
+        /// Enumerates the four intercardinal compass directions
+        /// </summary>
+        public static IList<Direction> IntercardinalDirections => new List<Direction> {NW, SE, NE, SW};
 
+        /// <summary>
+        /// The <see cref="Direction"/> a given <see cref="Vec2"/> is pointing.
+        /// </summary>
         public static Direction Towards(Vec2 position)
         {
             Vec2 offset = Vec2.Zero;

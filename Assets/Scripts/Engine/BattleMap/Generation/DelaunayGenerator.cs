@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Content;
 using Rhynn.Engine.AI;
-using UnityEngine;
 using Util;
 using Util.Pathfinding;
 using Rect = Util.Rect;
@@ -46,12 +44,16 @@ namespace Rhynn.Engine.Generation
         /// </summary>
         private void Reset()
         {
-            _map.Actors.Clear();
+            _map.ClearActors();
             //_map.Items.Clear();
             
             _openCount = 0;
-            _map.Tiles.Fill(position => new GridTile(Tiles.Stone, position));
             
+            // Overwrite the map tiles, edges, and vertices with default "blank" things
+            _map.Tiles.Fill(position => new GridNode(Tiles.Stone, position, _map.Tiles));
+            _map.Tiles.FillEdges((position, annotation) => new GridEdge(position, annotation));
+            _map.Tiles.FillVertices((position) => new GridVertex(position));
+
             _factory = new DelaunayFeatureFactory(this);
         }
 
@@ -88,30 +90,30 @@ namespace Rhynn.Engine.Generation
         /// <summary>
         /// Creates a fresh pathfinding graph from the map bounds by generating empty edges connecting each tile.
         /// </summary>
-        private void InitializePathfindingGraph()
+        private void InitializePathfindingGraph() // TODO: !!!==== Move this to PathfindingGraph, it can be done automatically.
         {
             // Iterate over each of the tiles within the battlemap boundaries
-            foreach (Vec2 tileCoordinates in _map.Bounds)
+            //foreach (Vec2 tileCoordinates in _map.Bounds)
             {
-                IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
+                //GridNode tile = _map.Tiles[tileCoordinates];
 
                 // Look at each of the eight compass directions
-                foreach (Direction direction in Direction.Clockwise)
+                //foreach (Direction direction in Direction.Clockwise)
                 {
                     // Check that the neighbor is in bounds
-                    Vec2 neighborCoordinates = tileCoordinates + direction.Offset;
-                    if (!_map.Bounds.Contains(neighborCoordinates)) continue;
+                   // Vec2 neighborCoordinates = tileCoordinates + direction.Offset;
+                   // if (!_map.Bounds.Contains(neighborCoordinates)) continue;
 
                     // Calculate the weight. Diagonals are more expensive than the cardinal directions.
-                    float weight;
-                    if (Math.Abs(direction.Offset.x) > 0 && Math.Abs(direction.Offset.y) > 0)
-                        weight = 1.41422f;
-                    else
-                        weight = 1f;
+                   // float weight;
+                    //if (Math.Abs(direction.Offset.x) > 0 && Math.Abs(direction.Offset.y) > 0)
+                    //    weight = 1.41422f;
+                    //else
+                    //    weight = 1f;
                     
                     // Add the neighbor
-                    IPathfindingNode neighbor = _map.Tiles.GetNodeAt(neighborCoordinates);
-                    tile.AddNeighbor(neighbor, weight, direction);
+                    //GridNode neighbor = _map.Tiles[neighborCoordinates];
+                    //tile.AddNeighbor(neighbor, weight, direction);
                 }
             }
         }
@@ -119,20 +121,20 @@ namespace Rhynn.Engine.Generation
         /// <summary>
         /// Finalizes the traversability of the nodes within the battlemap.
         /// </summary>
-        private void CalculateTraversability()
+        private void CalculateTraversability() // TODO: !!!=== Move this to the PathfindingGrid class, this can be done automatically
         {
-            foreach (Vec2 tileCoordinates in _map.Bounds)
+            //foreach (Vec2 tileCoordinates in _map.Bounds)
             {
-                IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
+                //GridNode tile = _map.Tiles[tileCoordinates];
                 
                 // Ghosts can walk through all tiles (TODO: change this so that it must remain adjacent to any object’s exterior, and so cannot pass entirely through an object whose space is larger than its own)
-                tile.SetIncomingTraversableFlag(Motility.Incorporeal);
+                //tile.SetIncomingTraversableFlag(Motility.Incorporeal);
 
                 // Sets edges based on end node, irrespective of starting node. So this is valid:
                 // TileType.Wall--Traversable.Land-->TileType.Floor
-                if (tile.Type == Tiles.Floor)
+                //if (tile.Type == Tiles.Floor)
                 {
-                    tile.SetIncomingTraversableFlag(Motility.Land);
+                    //tile.SetIncomingTraversableFlag(Motility.Land);
                 }
                 
                 // TODO: Restrict traversability based on neighboring nodes for diagonals
@@ -148,10 +150,10 @@ namespace Rhynn.Engine.Generation
             int openCount = 0;
             foreach (Vec2 tileCoordinates in _map.Bounds)
             {
-                IPathfindingNode tile = _map.Tiles.GetNodeAt(tileCoordinates);
+                GridNode tile = _map.Tiles[tileCoordinates];
 
                 // Do a final pass to see how much battlemap we've carved
-                if (tile.NeighborMap.Keys.Any(neighbor => neighbor.IsTraversableTo(tile, Motility.Land)))
+                if (tile.Neighbors.Any(neighbor => neighbor.CanEnter(tile, Motility.Land)))
                 {
                     openCount++;
                 }
@@ -166,7 +168,7 @@ namespace Rhynn.Engine.Generation
 
         public DelaunayGeneratorOptions Options => _options;
 
-        public IPathfindingGraph Graph => _map.Tiles;
+        public PathfindingGrid Graph => _map.Tiles;
 
         /// <summary>
         /// Gets whether the given rectangle is empty (i.e. solid stone) and can have a feature placed in it.
@@ -193,31 +195,31 @@ namespace Rhynn.Engine.Generation
             return true;
         }
 
-        public IPathfindingNode GetTile(Vec2 position)
+        public GridNode GetTile(Vec2 position)
         {
             return _map.Tiles[position];
         }
 
         public void SetTile(Vec2 position, TileType type)
         {
-            _map.Tiles[position].Type = type;
+            _map.Tiles[position] = new GridNode(type, type.Motility, position, _map.Tiles);
         }
 
         public void Populate(Vec2 position)
         {
             // TODO: Expand this to populate for NPCs with non-typical motilities (flying creatures, sea monsters, etc).
-            if (_map.Tiles[position].CanEnter(Motility.Land))
+            if (_map.Tiles[position].AllowsMotility(Motility.Land))
             {
                 // Place an NPC TODO: Check that tile is not occupied
                 Actor actor = new Actor(_map.Game, position, 0);
-                actor.SetAI<WanderAimlesslyAI>();
+                actor.SetAI<MeleeMookAI>();
                 AddActor(actor);
             }
         }
 
         public void AddActor(Actor actor)
         {
-            _map.Actors.Add(actor);
+            _map.AddActor(actor);
         }
 
         #endregion

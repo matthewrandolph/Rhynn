@@ -9,16 +9,16 @@ namespace Tests
 {
     public class WeightedEdgeTests
     {
-        private IPathfindingNode start;
-        private IPathfindingNode end;
-        private WeightedEdge edge;
+        private IPathfindingNode<GridTile> start;
+        private IPathfindingNode<GridTile> end;
+        private WeightedEdge<GridTile> edge;
 
         [SetUp]
         public void Init()
         {
-            start = new GridTile(Tiles.Floor, new Vec2(0, 0));
+            /*start = new GridTile(Tiles.Floor, new Vec2(0, 0));
             end = new GridTile(Tiles.Floor, new Vec2(1, 1));
-            edge = new WeightedEdge(start, end, 1, Direction.E);
+            edge = new WeightedEdge(start, end, 1, Direction.E);*/
         }
         
         [Test]

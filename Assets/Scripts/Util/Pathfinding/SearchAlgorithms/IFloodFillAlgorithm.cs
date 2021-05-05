@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Util.Pathfinding
+namespace Util.Pathfinding.SearchAlgorithms
 {
     /// <summary>
     /// Interface to represent graph flood-filling style algorithms used by a pathfinding agent.
@@ -15,7 +15,6 @@ namespace Util.Pathfinding
         /// <param name="motility">The motility of the agent. Any edges that don't contain one of
         ///     these flags is thrown out.</param>
         /// <returns>All nodes where the traversal cost is less than or equal to searchDepth.</returns>
-        IDictionary<IPathfindingNode, IPathfindingNode> Fill(IPathfindingNode start, float searchDepth,
-            Motility motility);
+        IDictionary<GridNode, GridNode> Fill(GridNode start, float searchDepth, Motility motility);
     }
 }

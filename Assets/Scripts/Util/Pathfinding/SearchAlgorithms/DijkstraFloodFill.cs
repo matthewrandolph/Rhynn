@@ -5,23 +5,22 @@ namespace Util.Pathfinding.SearchAlgorithms
 {
     public class DijkstraFloodFill : IFloodFillAlgorithm
     {
-        public IDictionary<IPathfindingNode, IPathfindingNode> Fill(IPathfindingNode start, float searchDepth, Motility motility)
+        public IDictionary<GridNode, GridNode> Fill(GridNode start, float searchDepth, Motility motility)
         {
-            Dictionary<IPathfindingNode, IPathfindingNode> parentMap = new Dictionary<IPathfindingNode, IPathfindingNode>();
-            SimplePriorityQueue<IPathfindingNode> frontier = new SimplePriorityQueue<IPathfindingNode>();
+            Dictionary<GridNode, GridNode> parentMap = new Dictionary<GridNode, GridNode>();
+            SimplePriorityQueue<GridNode> frontier = new SimplePriorityQueue<GridNode>();
 
             frontier.Enqueue(start, 0);
 
             while (frontier.Count > 0)
             {
-                IPathfindingNode current = frontier.Dequeue();
+                GridNode current = frontier.Dequeue();
 
-                foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in current.NeighborMap)
+                foreach (GridNode neighbor in current.Neighbors)
                 {
-                    IPathfindingEdge edge = entry.Value;
-                    IPathfindingNode neighbor = entry.Key;
+                    IPathfindingEdge edge = current.JoiningEdge(neighbor);
                     
-                    if (!SearchAlgorithmBase.IsTraversable(edge, motility)) continue;
+                    //if (!edge.IsTraversable(edge, motility)) continue;
                     
                     float newCost = current.PathCost + edge.Weight;
                     float neighborCost = neighbor.PathCost;

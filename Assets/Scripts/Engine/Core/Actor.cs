@@ -23,34 +23,45 @@ namespace Rhynn.Engine
             get => _position;
             set
             {
-                if (_position != value)
-                {
-                    Debug.Log("Position set on Actor object.");
-                    OnSetPosition(value);
-                }
+                if (_position != value) OnSetPosition(value);
             }
         }
         
         public int PlayerId { get; } // An id is generated for each human player. AI-controlled Actors are 0.
 
         public float Speed => 6; // TODO: base land speed for now, will probably end up an array of movement speeds or a dictionary or something to include other movement type speeds. Base speeds are calculated from racial base speeds as well as magical effects, equipment, etc.
+
+        public int Health // TODO: Move to own class so that it can be expanded to "overall vitality" i.e. how many hits before unconsciousness and "limb health" i.e. how much damage individual body parts have suffered.
+        {
+            get => _health;
+            set => Mathf.Clamp(value, 0, MaxHealth);
+        }
         
-        public bool IsAlive => true; // TODO: When health and stats are added, return whether the Actor's health is
-                                     // below negative their Constitution score. NOTE: what to do about undead/creatures
-                                     // that are destroyed at 0? Perhaps compare it to a deathHealthThreshold defined in race?
-                                     // PF2e has a neat dying mechanic that prevents auto-death.
+        // TODO: below negative their Constitution score. NOTE: what to do about undead/creatures
+        // that are destroyed at 0? Perhaps compare it to a deathHealthThreshold defined in race?
+        // PF2e has a neat dying mechanic that prevents auto-death, health stays at 0 but gain a Dying status effect and if it gets too high, the Actor dies.
+        public bool IsAlive { get; private set; }
+        
                                      
         public bool NeedsInput => _actorAI.NeedsUserInput;
 
-        public int ActionsPerTurn => 1;
-        public int RemainingActions { get; set; }
+        public int ActionsPerTurn => IsAlive ? _actionsPerTurn : 0;
+
+
+        public int RemainingActions
+        {
+            get => IsAlive ? _remainingActions : 0;
+            set => _remainingActions = value;
+        }
 
         public Motility Motility => Motility.Land; // TODO: Motility is calculated from racial base motility as well as magical effects, equipment, etc.
 
-        public bool CanOccupy(Vec2 position)
+        public int MaxHealth => 10; // TODO: Calculate this number from class levels, Constitution score, equipment, and magical effects.
+        
+        public bool CanOccupy(Vec2 position) // TODO: This method seems like it needs to change with the way the new pathfinding system works
         {
-            GridTile tile = Game.BattleMap.Tiles[position];
-            return tile.CanEnter(Motility);
+            GridNode tile = Game.BattleMap.Tiles[position];
+            return tile.AllowsMotility(Motility);
         }
 
         public Actor(Game game, Vec2 position, int playerId) 
@@ -60,6 +71,8 @@ namespace Rhynn.Engine
             PlayerId = playerId;
             
             _actorAI = new ActorAI(this);
+            _actionsPerTurn = 1;
+            IsAlive = true;
         }
 
         /*public IEnumerable<Action> StartTurn()
@@ -81,6 +94,68 @@ namespace Rhynn.Engine
         {
             yield return null;
         }*/
+
+        /// <summary>
+        /// Reduces the actor's health by <see cref="damage"/>, and handles its death.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="damage"></param>
+        /// <param name="attacker"></param>
+        /// <returns><c>true</c> if the actor died.</returns>
+        public bool TakeDamage(Action action, int damage, Actor attacker)
+        {
+            Health -= damage;
+            OnTakeDamage(action, attacker, damage);
+
+            if (IsAlive) return false;
+            
+            // Add an event to the action that the Actor has died.
+
+            OnDied();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Called when this actor has successfully hit this <see cref="defender"/>
+        /// </summary>
+        public void OnGiveDamage(Action action, Actor defender, int damage)
+        {
+            // Do nothing
+        }
+
+        /// <summary>
+        /// Called when <see cref="attacker"/> has successfully hit this actor.
+        /// </summary>
+        /// <remarks>The <see cref="attacker"/> may be <c>null</c> if the damage done is not the direct result of an
+        /// attack (for instance, poison).</remarks>
+        private void OnTakeDamage(Action action, Actor attacker, int damage)
+        {
+            // Do nothing
+        }
+
+        /// <summary>
+        /// Called when this Actor has been killed.
+        /// </summary>
+        private void OnDied()
+        {
+            Despawn();
+
+            // TODO: Actors turn to corpses when they die
+
+            // TODO: If the Actor was the party's final player character, then they lose the game
+        }
+
+        /// <summary>
+        /// Call this to remove this Actor from the current encounter, without explicitly killing it. Useful for
+        /// dismissing summons, fleeing, etc.
+        /// </summary>
+        public void Despawn()
+        {
+            // Game will automatically handle adjusting its own actor indexing as long as the actor is marked !IsAlive.
+            Game.BattleMap.RemoveActor(this);
+            IsAlive = false;
+        }
 
         private void OnSetPosition(Vec2 position)
         {
@@ -115,8 +190,16 @@ namespace Rhynn.Engine
         {
             _actorAI.SetActivity(activity);
         }
-        
+
+        public override string ToString()
+        {
+            return $"PlayerId: {PlayerId}, Position: {Position}";
+        }
+
         private ActorAI _actorAI;
         private Vec2 _position;
+        private int _health;
+        private readonly int _actionsPerTurn;
+        private int _remainingActions;
     }
 }

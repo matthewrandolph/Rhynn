@@ -15,13 +15,13 @@ namespace Rhynn.Engine.Generation
         /// </summary>
         Rect Bounds { get; }
 
-        IPathfindingGraph Graph { get; }
+        PathfindingGrid Graph { get; }
 
         bool IsOpen(Rect rect, [CanBeNull] Vec2? exception);
         
         void SetTile(Vec2 position, TileType type);
 
-        IPathfindingNode GetTile(Vec2 position);
+        GridNode GetTile(Vec2 position);
 
         void Populate(Vec2 position);
 

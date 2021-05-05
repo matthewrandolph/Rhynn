@@ -21,4 +21,18 @@ namespace Rhynn.Engine.AI
         
         List<Action> GetNextActivity();
     }
+    
+    public abstract class DecisionMakingAlgorithmBase : IDecisionMakingAlgorithm
+    {
+        public virtual bool NeedsUserInput => false;
+        
+        public void SetActor(NotNull<Actor> actor)
+        {
+            Actor = actor;
+        }
+
+        public abstract List<Action> GetNextActivity();
+
+        protected Actor Actor;
+    }
 }

@@ -7,18 +7,16 @@ namespace Util.Pathfinding
     /// <summary>
     /// Designates that the class has a pathfinding graph that can traversed by a pathfinding agent.
     /// </summary>
-    public interface IPathfindingGraph
+    public interface IPathfindingGraph<T>
     {
-        IPathfindingNode GetNodeAt(Vec2 coordinates);
-
-        IList<IPathfindingNode> Pathfinder<TSearchAlgorithm>(IPathfindingNode start, IPathfindingNode goal,
+        IList<GridNode> FindPath<TSearchAlgorithm>(GridNode start, GridNode goal,
             Motility agentMotility) where TSearchAlgorithm : ISearchAlgorithm, new();
 
-        IList<IPathfindingNode> Pathfinder<TSearchAlgorithm>(IPathfindingNode start, IPathfindingNode goal, 
-            Motility agentMotility, Func<IPathfindingNode, IPathfindingNode, float> heuristic) 
+        IList<GridNode> FindPath<TSearchAlgorithm>(GridNode start, GridNode goal, 
+            Motility agentMotility, Func<GridNode, GridNode, float> heuristic) 
             where TSearchAlgorithm : ISearchAlgorithm, new();
 
-        IDictionary<IPathfindingNode, IPathfindingNode> Pathfinder<TFloodFillAlgorithm>(IPathfindingNode start, 
+        IDictionary<GridNode, GridNode> FloodFill<TFloodFillAlgorithm>(GridNode start, 
             float searchDepth, Motility agentMotility) where TFloodFillAlgorithm : IFloodFillAlgorithm, new();
     }
 }

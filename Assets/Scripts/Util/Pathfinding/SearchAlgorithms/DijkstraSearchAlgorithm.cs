@@ -5,26 +5,25 @@ namespace Util.Pathfinding.SearchAlgorithms
 {
     public class DijkstraSearchAlgorithm : SearchAlgorithmBase
     {
-        public override IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal,
+        public override IList<GridNode> Search(GridNode start, GridNode goal,
             Motility motility)
         {
-            Dictionary<IPathfindingNode, IPathfindingNode> parentMap = new Dictionary<IPathfindingNode, IPathfindingNode>();
-            SimplePriorityQueue<IPathfindingNode> frontier = new SimplePriorityQueue<IPathfindingNode>();
+            Dictionary<GridNode, GridNode> parentMap = new Dictionary<GridNode, GridNode>();
+            SimplePriorityQueue<GridNode> frontier = new SimplePriorityQueue<GridNode>();
             
             frontier.Enqueue(start, start.PathCost);
 
             while (frontier.Count > 0)
             {
-                IPathfindingNode current = frontier.Dequeue();
+                GridNode current = frontier.Dequeue();
 
                 if (current == goal) break;
 
-                foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in current.NeighborMap)
+                foreach (GridNode neighbor in current.Neighbors)
                 {
-                    IPathfindingEdge edge = entry.Value;
-                    IPathfindingNode neighbor = entry.Key;
+                    IPathfindingEdge edge = current.JoiningEdge(neighbor);
 
-                    if (!IsTraversable(edge, motility)) continue;
+                    //if (!IsTraversable(edge, motility)) continue; // TODO: Make this unnecessary
 
                     float newCost = current.PathCost + edge.Weight;
                     float neighborCost = neighbor.PathCost;
@@ -39,7 +38,7 @@ namespace Util.Pathfinding.SearchAlgorithms
                 }
             }
 
-            IList<IPathfindingNode> path = ReconstructPath(parentMap, start, goal);
+            IList<GridNode> path = ReconstructPath(parentMap, start, goal);
             return path;
         }
     }

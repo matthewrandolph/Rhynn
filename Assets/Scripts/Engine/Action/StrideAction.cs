@@ -28,10 +28,10 @@ namespace Rhynn.Engine
             // TODO: See if the tile is occupied already
             
             // See if we can get there
-            IPathfindingNode position = BattleMap.Tiles.GetNodeAt(Actor.Position);
-            IDictionary<IPathfindingNode, IPathfindingNode> moveableTiles = 
-                BattleMap.Tiles.Pathfinder<DijkstraFloodFill>(position, Actor.Speed, Actor.Motility);
-            IPathfindingNode destination = BattleMap.Tiles.GetNodeAt(Destination);
+            GridNode position = BattleMap.Tiles[Actor.Position];
+            IDictionary<GridNode, GridNode> moveableTiles = 
+                BattleMap.Tiles.FloodFill<DijkstraFloodFill>(position, Actor.Speed, Actor.Motility);
+            GridNode destination = BattleMap.Tiles[Destination];
             
             bool contains = moveableTiles.ContainsKey(destination);
             

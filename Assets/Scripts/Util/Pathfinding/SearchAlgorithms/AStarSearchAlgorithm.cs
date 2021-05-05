@@ -6,25 +6,25 @@ namespace Util.Pathfinding.SearchAlgorithms
 {
     public class AStarSearchAlgorithm : SearchAlgorithmBase
     {
-        public override IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal, Motility motility, Func<IPathfindingNode, IPathfindingNode, float> heuristic)
+        public override IList<GridNode> Search(GridNode start, GridNode goal, Motility motility, 
+            Func<GridNode, GridNode, float> heuristic)
         {
-            Dictionary<IPathfindingNode, IPathfindingNode> parentMap = new Dictionary<IPathfindingNode, IPathfindingNode>();
-            SimplePriorityQueue<IPathfindingNode> frontier = new SimplePriorityQueue<IPathfindingNode>();
+            Dictionary<GridNode, GridNode> parentMap = new Dictionary<GridNode, GridNode>();
+            SimplePriorityQueue<GridNode> frontier = new SimplePriorityQueue<GridNode>();
             
             frontier.Enqueue(start, start.PathCost);
 
             while (frontier.Count > 0)
             {
-                IPathfindingNode current = frontier.Dequeue();
+                GridNode current = frontier.Dequeue();
 
                 if (current == goal) break;
 
-                foreach (KeyValuePair<IPathfindingNode, IPathfindingEdge> entry in current.NeighborMap)
+                foreach (GridNode neighbor in current.Neighbors)
                 {
-                    IPathfindingEdge edge = entry.Value;
-                    IPathfindingNode neighbor = entry.Key;
+                    IPathfindingEdge edge = current.JoiningEdge(neighbor);
 
-                    if (!IsTraversable(edge, motility)) continue;
+                    //if (!IsTraversable(edge, motility)) continue; // TODO: This line should be made irrelevant
 
                     float newCost = current.PathCost + edge.Weight;
                     float neighborCost = neighbor.PathCost;
@@ -32,14 +32,14 @@ namespace Util.Pathfinding.SearchAlgorithms
 
                     if (containsKey && (newCost >= neighborCost)) continue;
 
-                    neighborCost = newCost;
+                    neighbor.PathCost = newCost;
                     parentMap[neighbor] = current; // UPSERT dictionary function
                     float priority = newCost + heuristic(goal, neighbor);
                     frontier.Enqueue(neighbor, priority);
                 }
             }
 
-            IList<IPathfindingNode> path = ReconstructPath(parentMap, start, goal);
+            IList<GridNode> path = ReconstructPath(parentMap, start, goal);
             return path;
         }
     }

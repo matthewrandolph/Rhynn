@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Util.Pathfinding.SearchAlgorithms
 {
     /// <summary>
-    /// Interface to represent graph searching algorithms used by a pathfinding agent.
+    /// Interface to represent graph searching algorithms used by a pathfinding agent on an <see cref="IPathfindingGraph{T}"/>.
     /// </summary>
     public interface ISearchAlgorithm
     {
@@ -18,7 +18,7 @@ namespace Util.Pathfinding.SearchAlgorithms
         /// <param name="motility">The traversability of the agent. Any edges that don't contain one of
         ///     these flags is thrown out.</param>
         /// <returns>The path from the start node to the goal node, inclusive.</returns>
-        IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal, Motility motility);
+        IList<GridNode> Search(GridNode start, GridNode goal, Motility motility);
         /// <summary>
         /// This algorithm returns a path from the start to end node, following only edges that are traversable.
         /// </summary>
@@ -28,8 +28,8 @@ namespace Util.Pathfinding.SearchAlgorithms
         ///     these flags is thrown out.</param>
         /// <param name="heuristic"></param>
         /// <returns></returns>
-        IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal, Motility motility,
-            Func<IPathfindingNode, IPathfindingNode, float> heuristic);
+        IList<GridNode> Search(GridNode start, GridNode goal, Motility motility,
+            Func<GridNode, GridNode, float> heuristic);
     }
 
     /// <summary>
@@ -48,15 +48,15 @@ namespace Util.Pathfinding.SearchAlgorithms
          * traversability flag Traversable.CantEndMovementHere and if the (pathCost % (mod) moveSpeed == 0) then reject
          * that edge in the IsTraversable function, or alternatively in a separate check.
          */ 
-        public virtual IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal, 
+        public virtual IList<GridNode> Search(GridNode start, GridNode goal, 
             Motility motility)
         {
             throw new NotImplementedException(
                 "\"A heuristic is required for this algorithm. Use \"Search(IPathfindingNode start, IPathfindingNode end, Traversable traversability, Func<IPathfindingNode, IPathfindingNode, float> heuristic)\" instead.");
         }
 
-        public virtual IList<IPathfindingNode> Search(IPathfindingNode start, IPathfindingNode goal, 
-            Motility motility, Func<IPathfindingNode, IPathfindingNode, float> heuristic)
+        public virtual IList<GridNode> Search(GridNode start, GridNode goal, 
+            Motility motility, Func<GridNode, GridNode, float> heuristic)
         {
             throw new NotImplementedException(
                 "\"This algorithm does not use a heuristic. Use \"Search(IPathfindingNode start, IPathfindingNode end, Traversable traversability)\" instead.");
@@ -69,7 +69,7 @@ namespace Util.Pathfinding.SearchAlgorithms
         /// </summary>
         /// <param name="edge">The edge attempting traversal.</param>
         /// <param name="agentMotility">The agent's ability to traverse edges.</param>
-        public static bool IsTraversable(IPathfindingEdge edge, Motility agentMotility)
+        public static bool IsTraversable(GridNode edge, Motility agentMotility)
         {
             // Identify the graph structure for this agent and reject extraneous neighbors.
             if (agentMotility.Contains(Motility.AllNeighbors))
@@ -79,7 +79,7 @@ namespace Util.Pathfinding.SearchAlgorithms
             else if (agentMotility.Contains(Motility.EightWayNeighbors))
             {
                 // Reject only special nodes (such as portals)
-                if (!Direction.Clockwise.Contains(edge.Direction))
+                //if (!Direction.Clockwise.Contains(edge.Direction))
                 {
                     return false;
                 }
@@ -87,7 +87,7 @@ namespace Util.Pathfinding.SearchAlgorithms
             else if (agentMotility.Contains(Motility.FourWayNeighbors))
             {
                 // Reject the intercardinal directions (diagonals) as well as any special nodes (such as portals)
-                if (!Direction.CardinalDirections.Contains(edge.Direction))
+                //if (!Direction.CardinalDirections.Contains(edge.Direction))
                 {
                     return false;
                 }
@@ -102,7 +102,8 @@ namespace Util.Pathfinding.SearchAlgorithms
             if (agentMotility.Contains(Motility.Unconstrained)) return true;
 
             // Check the agent's movement Motility compared to the edge Motility
-            return edge.IsTraversable(agentMotility);
+            throw new NotImplementedException();
+            //return edge.IsTraversable(agentMotility);
         }
 
         /// <summary>
@@ -110,12 +111,12 @@ namespace Util.Pathfinding.SearchAlgorithms
         ///     instead of an IDictionary.
         /// </summary>
         /// <returns>The list of nodes from start to goal (inclusive).</returns>
-        protected IList<IPathfindingNode> ReconstructPath(IDictionary<IPathfindingNode, IPathfindingNode> parentMap,
-            IPathfindingNode start, IPathfindingNode goal)
+        protected IList<GridNode> ReconstructPath(IDictionary<GridNode, GridNode> parentMap,
+            GridNode start, GridNode goal)
         {
-            if (parentMap.Count == 0) throw new NoPathFoundException($"Cannot find a path between nodes {start.Position} and {goal.Position}");
-            List<IPathfindingNode> path = new List<IPathfindingNode>();
-            IPathfindingNode current = goal;
+            if (parentMap.Count == 0) throw new NoPathFoundException($"Cannot find a path between nodes {start} and {goal}");
+            List<GridNode> path = new List<GridNode>();
+            GridNode current = goal;
 
             while (current != start)
             {

@@ -148,22 +148,22 @@ namespace Rhynn.Engine.Generation
                 Rect startRoom = (edge.U as Vertex<Rect>).Item;
                 Rect endRoom = (edge.V as Vertex<Rect>).Item;
 
-                GridTile start = (GridTile) _writer.GetTile(new Vec2(startRoom.Center.x, startRoom.Center.y));
-                GridTile goal = (GridTile) _writer.GetTile(new Vec2(endRoom.Center.x, endRoom.Center.y));
+                GridNode start = _writer.GetTile(new Vec2(startRoom.Center.x, startRoom.Center.y));
+                GridNode goal = _writer.GetTile(new Vec2(endRoom.Center.x, endRoom.Center.y));
 
                 // Heuristic is Manhattan distance on a square grid
-                IList<IPathfindingNode> path = _writer.Graph.Pathfinder<AStarSearchAlgorithm>(start, goal,
+                IList<GridNode> path = _writer.Graph.FindPath<AStarSearchAlgorithm>(start, goal,
                     motility, (a, b) => 
-                        Math.Abs(a.Position.x - b.Position.x) + Math.Abs(a.Position.y - b.Position.y));
+                        Math.Abs((float) (a.Position.x - b.Position.x)) + Math.Abs((float) (a.Position.y - b.Position.y)));
 
                 // Bail if the pathfinder failed to find a path (NOTE: if it does, it seems like it should be a problem)
                 if (path == null) continue;
-                foreach (IPathfindingNode step in path)
+                foreach (GridNode step in path)
                 {
                     _writer.SetTile(step.Position, Tiles.Floor);
-                    foreach (IPathfindingNode neighbor in step.NeighborMap.Keys)
+                    foreach (GridNode neighbor in step.Neighbors)
                     {
-                        if (((GridTile) _writer.GetTile(neighbor.Position)).Type == Tiles.Stone)
+                        if ((_writer.GetTile(neighbor.Position)).Type == Tiles.Stone)
                         {
                             _writer.SetTile(neighbor.Position, Tiles.Wall);
                         }

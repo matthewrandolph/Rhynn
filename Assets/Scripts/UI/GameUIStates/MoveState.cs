@@ -56,12 +56,12 @@ namespace Rhynn.UI
             // Do some basic verification that the tile wont be rejected by the engine. No point in telling the
             // engine if it is just going to throw the action away.
             Actor actor = Screen.Game.CurrentActor;
-            IPathfindingGraph tiles = Screen.Game.BattleMap.Tiles;
+            PathfindingGrid tiles = Screen.Game.BattleMap.Tiles;
                 
-            IPathfindingNode position = tiles.GetNodeAt(actor.Position);
-            IDictionary<IPathfindingNode, IPathfindingNode> moveableTiles = 
-                tiles.Pathfinder<DijkstraFloodFill>(position, actor.Speed, actor.Motility);
-            IPathfindingNode destination = tiles.GetNodeAt(tileSelected);
+            GridNode position = tiles[actor.Position];
+            IDictionary<GridNode, GridNode> moveableTiles = 
+                tiles.FloodFill<DijkstraFloodFill>(position, actor.Speed, actor.Motility);
+            GridNode destination = tiles[tileSelected];
 
             if (!moveableTiles.ContainsKey(destination)) return;
             

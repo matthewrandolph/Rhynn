@@ -10,33 +10,24 @@ namespace Rhynn.Engine.AI
     /// Causes the <see cref="Actor"/> to repeatedly take <see cref="StrideAction"/>s to a random tile accessible by
     /// the actor. The actor will appear to be wandering aimlessly around.
     /// </summary>
-    public class WanderAimlesslyAI : IDecisionMakingAlgorithm
+    public class WanderAimlesslyAI : DecisionMakingAlgorithmBase
     {
         #region IDecisionMakingAlgorithm
-
-        public bool NeedsUserInput => false;
-
-        public void SetActor(NotNull<Actor> actor)
-        {
-            _actor = actor;
-        }
 
         /// <summary>
         /// Returns a <see cref="StrideAction"/> to a random tile accessible by the actor.
         /// </summary>
-        public List<Action> GetNextActivity()
+        public override List<Action> GetNextActivity()
         {
-            if (_actor == null) throw new NullReferenceException("You must call SetActor() before you can call GetNextActivity() on WanderAimlesslyAI.");
+            if (Actor == null) throw new NullReferenceException("You must call SetActor() before you can call GetNextActivity() on WanderAimlesslyAI.");
             
-            var tiles = _actor.Game.BattleMap.Tiles;
-            var viableTiles = tiles.Pathfinder<DijkstraFloodFill>(
-                tiles.GetNodeAt(_actor.Position), _actor.Speed, _actor.Motility);
-            var newPosition = viableTiles.ElementAt(Rng.Int(0, viableTiles.Count)).Value.Position;
-            return new List<Action> { new StrideAction(_actor, newPosition) };
+            var tiles = Actor.Game.BattleMap.Tiles;
+            var viableTiles = tiles.FloodFill<DijkstraFloodFill>(
+                tiles[Actor.Position], Actor.Speed, Actor.Motility);
+            Vec2 newPosition = viableTiles.ElementAt(Rng.Int(0, viableTiles.Count)).Value.Position;
+            return new List<Action> { new StrideAction(Actor, newPosition) };
         }
         
         #endregion
-
-        private Actor _actor;
     }
 }

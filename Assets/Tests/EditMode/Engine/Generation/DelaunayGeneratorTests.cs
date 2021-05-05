@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Rhynn.Engine;
 using Rhynn.Engine.Generation;
 using Util;
+using Util.Pathfinding;
 
 namespace Tests
 {
@@ -40,7 +41,7 @@ namespace Tests
         public void IsOpen_OverlapsExisting_False()
         {
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
-            BattleMap.Tiles[2, 2] = new GridTile(Tiles.Wall, new Vec2(2, 2));
+            BattleMap.Tiles[2, 2] = new GridNode(Tiles.Wall, new Vec2(2, 2), BattleMap.Tiles);
 
             Assert.IsFalse(generator.IsOpen(new Rect(3,3), null));
         }
@@ -49,7 +50,7 @@ namespace Tests
         public void IsOpen_NewContainsExisting_False()
         {
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
-            BattleMap.Tiles[4, 4] = new GridTile(Tiles.Wall, new Vec2(4, 4));
+            BattleMap.Tiles[4, 4] = new GridNode(Tiles.Wall, new Vec2(4, 4), BattleMap.Tiles);
             
             Assert.IsFalse(generator.IsOpen(new Rect(0, 0, 10,10), null));
         }
@@ -60,7 +61,7 @@ namespace Tests
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
             foreach (var tile in new Rect(10, 10))
             {
-                BattleMap.Tiles[tile.x, tile.y] = new GridTile(Tiles.Wall, new Vec2(tile.x, tile.y));
+                BattleMap.Tiles[tile.x, tile.y] = new GridNode(Tiles.Wall, new Vec2(tile.x, tile.y), BattleMap.Tiles);
             }
             
             Assert.IsFalse(generator.IsOpen(new Rect(3, 3, 2, 2), null));
@@ -70,7 +71,7 @@ namespace Tests
         public void IsOpen_CoversExistingButIsInException_True()
         {
             var generator = new DelaunayGenerator(BattleMap, new DelaunayGeneratorOptions());
-            BattleMap.Tiles[2, 2] = new GridTile(Tiles.Wall, new Vec2(2, 2));
+            BattleMap.Tiles[2, 2] = new GridNode(Tiles.Wall, new Vec2(2, 2), BattleMap.Tiles);
 
             Assert.IsTrue(generator.IsOpen(new Rect(3,3), new Vec2(2, 2)));
         }

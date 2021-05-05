@@ -1,6 +1,7 @@
 ﻿using Rhynn.Engine;
 using UnityEngine;
 using Util;
+using Util.Pathfinding;
 
 namespace UI.Graphics
 {
@@ -17,6 +18,8 @@ namespace UI.Graphics
         [SerializeField] private int tileResolution;
         [SerializeField] private FilterMode tileTextureFilterMode;
         [SerializeField] private TextureWrapMode tileTextureWrapMode;
+
+        [SerializeField] private bool DebugMode;
 
         public float TileSize => tileSize;
 
@@ -146,6 +149,58 @@ namespace UI.Graphics
             }
 
             return tiles;
+        }
+
+        public void OnDrawGizmos()
+        {
+            if (DebugMode)
+            {
+                foreach (var tileCoordinate in _game.BattleMap.Bounds)
+                {
+                    var x = tileCoordinate.x + 0.5f;
+                    var z = tileCoordinate.y + 0.5f;
+                    var tileWorldSpaceCoordinates = new Vector3(x, 1, z);
+
+                    var tile = _game.BattleMap.Tiles[tileCoordinate];
+                
+                    Gizmos.color = tile.AllowsMotility(Motility.Land) ? Color.green : Color.red;
+                
+                    Gizmos.DrawWireSphere(tileWorldSpaceCoordinates, 0.15f);
+
+                    foreach (var neighbor in tile.Neighbors)
+                    {
+                        var color = tile.CanEnter(neighbor, Motility.Land) ? Color.green : Color.red;
+
+                        var neighborX = neighbor.Position.x + 0.5f;
+                        var neighborZ = neighbor.Position.y + 0.5f;
+                        var neighborWorldSpaceCoordinates = new Vector3(neighborX, 1, neighborZ);
+                        
+                        var arrowStartVector = Vector3.Lerp(tileWorldSpaceCoordinates,
+                            neighborWorldSpaceCoordinates, 0.2f);
+                        var arrowEndVector = Vector3.Lerp(tileWorldSpaceCoordinates,
+                            neighborWorldSpaceCoordinates, 0.9f);
+                        
+                        DrawArrow.ForDebug(arrowStartVector, arrowEndVector - arrowStartVector, color);
+                    }
+                }
+                
+                var tile1 = _game.BattleMap.Tiles[0, 0];
+                var x1 = tile1.Position.x + 0.5f;
+                var z1 = tile1.Position.y + 0.5f;
+                var tile1WorldSpaceCoordinates = new Vector3(x1, 1, z1);
+                
+                var tile2 = _game.BattleMap.Tiles[0, 1];
+                var x2 = tile2.Position.x + 0.5f;
+                var z2 = tile2.Position.y + 0.5f;
+                var tile2WorldSpaceCoordinates = new Vector3(x2, 1, z2);
+
+                var arrowColor = Color.green;
+
+                var startCoordinates = Vector3.Lerp(tile1WorldSpaceCoordinates, tile2WorldSpaceCoordinates, 0.2f);
+                var endCoordinates = Vector3.Lerp(tile1WorldSpaceCoordinates, tile2WorldSpaceCoordinates, 0.8f);
+                
+                DrawArrow.ForDebug(startCoordinates, endCoordinates - startCoordinates, arrowColor);
+            }
         }
 
         private Game _game;

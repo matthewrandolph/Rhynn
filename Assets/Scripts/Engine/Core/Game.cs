@@ -67,7 +67,10 @@ namespace Rhynn.Engine
                     {
                         // bail if we need to wait for the UI or AI to provide an action
                         while (CurrentActor.NeedsInput)
+                        {
+                            Debug.Log("Waiting on user input.");
                             yield return new GameResult(false);
+                        }
 
                         // get the actor's action
                         Action action = CurrentActor.TakeTurn();
@@ -82,9 +85,10 @@ namespace Rhynn.Engine
                     
                     // actor.EndTurn(); - TODO: add end of turn stuff. Perhaps make this a "foreach GameResult in" loop as well. This is used for any "end of turn" effects, such as enemy debuffs running out, etc.
                     
-                    // actor was killed, so it will be removed from the collection and the next one shifted up.
+                    // actor was killed, so remove from the collection and shift the next one up.
                     if (!CurrentActor.IsAlive)
                     {
+                        BattleMap.RemoveActor(CurrentActor);
                         actorIndex--;
                     }
                 }
@@ -119,12 +123,14 @@ namespace Rhynn.Engine
                 // remove it if complete
                 if (result.Done)
                 {
+                    Debug.Log("ActionResult.Done: Dequeuing action.");
                     actions.Dequeue();
                 }
                 
                 // Run the post step
                 if (result.Succeeded)
                 {
+                    Debug.Log("ActionResult.Success: Running AfterSuccess().");
                     action.AfterSuccess();
                 }
 
